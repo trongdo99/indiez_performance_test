@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 109843040}
   - component: {fileID: 109843041}
-  - component: {fileID: 109843043}
   - component: {fileID: 109843042}
   m_Layer: 5
   m_Name: LeftJoystick
@@ -178,41 +177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1bf18796f0e40ff921e748e384448f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &109843043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 109843039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MovementRange: 50
-  m_DynamicOriginRange: 100
-  m_ControlPath: <Gamepad>/leftStick
-  m_Behaviour: 0
-  m_UseIsolatedInputActions: 0
-  m_PointerDownAction:
-    m_Name: Pointer Down
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 8d83f35d-4c73-4072-9cf1-030a6525b19c
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  m_PointerMoveAction:
-    m_Name: Pointer Move
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 132da611-ea83-4985-8993-370e20d749d8
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
 --- !u!114 &145815186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1235,6 +1199,7 @@ GameObject:
   - component: {fileID: 1127062188}
   - component: {fileID: 1127062190}
   - component: {fileID: 1127062189}
+  - component: {fileID: 1127062191}
   m_Layer: 5
   m_Name: JoystickHandle
   m_TagString: Untagged
@@ -1299,6 +1264,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127062187}
   m_CullTransparentMesh: 1
+--- !u!114 &1127062191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127062187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MovementRange: 100
+  m_DynamicOriginRange: 100
+  m_ControlPath: <Gamepad>/rightStick
+  m_Behaviour: 0
+  m_UseIsolatedInputActions: 0
+  m_PointerDownAction:
+    m_Name: Pointer Down
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8d83f35d-4c73-4072-9cf1-030a6525b19c
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  m_PointerMoveAction:
+    m_Name: Pointer Move
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 132da611-ea83-4985-8993-370e20d749d8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &1236629001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1438,6 +1438,7 @@ GameObject:
   - component: {fileID: 1647621838}
   - component: {fileID: 1647621840}
   - component: {fileID: 1647621839}
+  - component: {fileID: 1647621841}
   m_Layer: 5
   m_Name: JoystickHandle
   m_TagString: Untagged
@@ -1502,6 +1503,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1647621837}
   m_CullTransparentMesh: 1
+--- !u!114 &1647621841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1647621837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MovementRange: 100
+  m_DynamicOriginRange: 100
+  m_ControlPath: <Gamepad>/leftStick
+  m_Behaviour: 0
+  m_UseIsolatedInputActions: 0
+  m_PointerDownAction:
+    m_Name: Pointer Down
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8d83f35d-4c73-4072-9cf1-030a6525b19c
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  m_PointerMoveAction:
+    m_Name: Pointer Move
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 132da611-ea83-4985-8993-370e20d749d8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!1 &1676410459
 GameObject:
   m_ObjectHideFlags: 0
@@ -1512,7 +1548,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1676410460}
   - component: {fileID: 1676410463}
-  - component: {fileID: 1676410462}
   - component: {fileID: 1676410461}
   m_Layer: 5
   m_Name: RightJoystick
@@ -1553,41 +1588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1bf18796f0e40ff921e748e384448f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1676410462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676410459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MovementRange: 50
-  m_DynamicOriginRange: 100
-  m_ControlPath: <Gamepad>/rightStick
-  m_Behaviour: 0
-  m_UseIsolatedInputActions: 0
-  m_PointerDownAction:
-    m_Name: Pointer Down
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 8d83f35d-4c73-4072-9cf1-030a6525b19c
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  m_PointerMoveAction:
-    m_Name: Pointer Move
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 132da611-ea83-4985-8993-370e20d749d8
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
 --- !u!222 &1676410463
 CanvasRenderer:
   m_ObjectHideFlags: 0
