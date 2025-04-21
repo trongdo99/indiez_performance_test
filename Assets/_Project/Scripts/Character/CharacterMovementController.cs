@@ -11,6 +11,7 @@ public class CharacterMovementController : MonoBehaviour
     [SerializeField] private Transform _modelRoot;
     
     private CharacterController _characterController;
+    private Camera _camera;
 
     private Vector2 _moveInput;
     private Vector2 _lookInput;
@@ -21,6 +22,12 @@ public class CharacterMovementController : MonoBehaviour
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
+        // Cache the ref to camera
+        _camera = Camera.main;
     }
 
     private void Update()
@@ -54,7 +61,7 @@ public class CharacterMovementController : MonoBehaviour
     {
         _moveInput = moveInput;
         
-        Vector3 forward = Camera.main.transform.TransformDirection(Vector3.forward);
+        Vector3 forward = _camera.transform.TransformDirection(Vector3.forward);
         forward.y = 0f;
         forward.Normalize();
 
