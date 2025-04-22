@@ -47,7 +47,8 @@ public class CharacterMovementController : MonoBehaviour
 
     private void LateUpdate()
     {
-        RotateTowardMovementDirection();
+        // RotateTowardMovementDirection();
+        RotateTowardTargetDirection();
     }
 
     public void SetMoveInput(Vector2 moveInput)
