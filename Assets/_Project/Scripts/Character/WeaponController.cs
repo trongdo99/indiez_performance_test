@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
 public class WeaponController : MonoBehaviour
@@ -9,6 +10,8 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private GameObject _sniperRifle;
     [SerializeField] private Transform _leftHandIkTargetTransform;
     [SerializeField] private Transform _leftHandIkHintTransform;
+    [SerializeField] private Transform _targetMarker;
+    [SerializeField] private Rig _aimRig;
 
     private Transform _weaponLeftHandAttachTransform;
     private Transform _weaponLeftHandHintTransform;
@@ -29,6 +32,17 @@ public class WeaponController : MonoBehaviour
         _leftHandIkTargetTransform.rotation = _weaponLeftHandAttachTransform.rotation;
         _leftHandIkHintTransform.position = _weaponLeftHandHintTransform.position;
         _leftHandIkHintTransform.rotation = _weaponLeftHandHintTransform.rotation;
+    }
+
+    public void Aiming(Transform targetTransform)
+    {
+        _targetMarker.position = targetTransform.position;
+        _aimRig.weight = 1f;
+    }
+
+    public void StopAiming()
+    {
+        _aimRig.weight = 0f;
     }
 
     public void SwitchWeapon(WeaponType toWeapon)
