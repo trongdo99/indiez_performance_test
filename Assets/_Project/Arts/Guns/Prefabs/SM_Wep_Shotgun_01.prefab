@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4579576397550642}
   - component: {fileID: 33893723093038062}
   - component: {fileID: 23936371116652476}
-  - component: {fileID: 1641372655971445426}
+  - component: {fileID: 8135899690330352581}
   m_Layer: 0
   m_Name: SM_Wep_Shotgun_01
   m_TagString: Untagged
@@ -92,7 +92,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1641372655971445426
+--- !u!114 &8135899690330352581
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,17 +101,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1105646471333690}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c99a10cb0a52a934bb3d7296d27e7e9f, type: 3}
+  m_Script: {fileID: 11500000, guid: f92f390a5216d95458f935986f96cc3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletSpawnPosition: {fileID: 1330581099540903662}
   _bulletTrail: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
   _muzzleFlash: {fileID: 8100396107369772786}
-  _shootDelay: 0.5
+  _shootDelay: 1
   _speed: 100
+  _missDistance: 100
+  _spread: {x: 0.3, y: 0.15}
   _targetableLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _bulletsPerShoot: 10
 --- !u!1 &1499018300189918
 GameObject:
   m_ObjectHideFlags: 0

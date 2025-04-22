@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 982d4a947adc39b40ab2da262a3df493, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentWeapon: 1
+  _currentWeapon: 0
   _shotgun: {fileID: 1192745605}
   _sniperRifle: {fileID: 1008282119}
   _leftHandIkTargetTransform: {fileID: 1546704233}
@@ -1998,8 +1998,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1528370248}
     - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _speed
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
       propertyPath: _shootDelay
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _bulletTrail
+      value: 
+      objectReference: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _muzzleFlash
+      value: 
+      objectReference: {fileID: 2124296933}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _bulletSpawnPosition
+      value: 
+      objectReference: {fileID: 1308518857}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _targetableLayerMask.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 7295375304413227067, guid: beecc60259940fb4883c123adc4e992f, type: 3}
       propertyPath: m_IsActive
@@ -2017,6 +2037,11 @@ PrefabInstance:
 --- !u!4 &1246533535 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4405352039967114, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+  m_PrefabInstance: {fileID: 1246533534}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1308518857 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4390392494432801710, guid: beecc60259940fb4883c123adc4e992f, type: 3}
   m_PrefabInstance: {fileID: 1246533534}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1389915753
@@ -2771,6 +2796,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1917196577}
   m_CullTransparentMesh: 1
+--- !u!198 &2124296933 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2251054357016864245, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+  m_PrefabInstance: {fileID: 1246533534}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -441,7 +441,7 @@ GameObject:
   - component: {fileID: 4252610548398956}
   - component: {fileID: 33612643866763530}
   - component: {fileID: 23875157421364124}
-  - component: {fileID: 854413670793136980}
+  - component: {fileID: 1928831924205445868}
   m_Layer: 0
   m_Name: SM_Wep_SniperRifle_01
   m_TagString: Untagged
@@ -525,7 +525,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &854413670793136980
+--- !u!114 &1928831924205445868
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -534,7 +534,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1658074229854742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c99a10cb0a52a934bb3d7296d27e7e9f, type: 3}
+  m_Script: {fileID: 11500000, guid: c3697da47db1a6140b156b83be512738, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletSpawnPosition: {fileID: 5910687763142826622}
@@ -542,6 +542,8 @@ MonoBehaviour:
   _muzzleFlash: {fileID: 8202866370392681509}
   _shootDelay: 1
   _speed: 100
+  _missDistance: 100
+  _spread: {x: 0.05, y: 0.1}
   _targetableLayerMask:
     serializedVersion: 2
     m_Bits: 64
