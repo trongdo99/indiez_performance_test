@@ -8,7 +8,6 @@ public class CharacterMovementController : MonoBehaviour
     [SerializeField] private float _movementSharpness = 15f;
     [SerializeField] private float _rotationSharpness = 15f;
     [SerializeField] private float _gravity = 30f;
-    [SerializeField] private Transform _modelRoot;
     
     private CharacterController _characterController;
     private Camera _camera;
@@ -16,6 +15,7 @@ public class CharacterMovementController : MonoBehaviour
     private Vector2 _moveInput;
     private Vector2 _lookInput;
     private Vector3 _cameraRelativeInput;
+    public Vector3 CurrentVelocity => _characterController.velocity;
     private Vector3 _currentVelocity;
     private Quaternion _currentRotation;
 
@@ -47,14 +47,7 @@ public class CharacterMovementController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_lookInput.magnitude > 0.01f)
-        {
-            Vector3 targetDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
-            Vector3 smoothedRotateDirection = Vector3.Slerp(_modelRoot.forward, targetDirection, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
-            _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
-        }
-        
-        _modelRoot.rotation = _currentRotation;
+        RotateTowardMovementDirection();
     }
 
     public void SetMoveInput(Vector2 moveInput)
@@ -85,10 +78,18 @@ public class CharacterMovementController : MonoBehaviour
         var movementVector = new Vector3(_currentVelocity.x, 0f, _currentVelocity.z);
         if (movementVector.magnitude > 0.01f)
         {
-            Vector3 smoothedRotateDirection = Vector3.Slerp(_modelRoot.forward, movementVector, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
+            Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, movementVector, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
             _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
         }
         
-        _modelRoot.rotation = _currentRotation;
+        transform.rotation = _currentRotation;
+    }
+
+    private void RotateTowardTargetDirection()
+    {
+        Vector3 targetDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
+        Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, targetDirection, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
+        _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
+        transform.rotation = _currentRotation;
     }
 }

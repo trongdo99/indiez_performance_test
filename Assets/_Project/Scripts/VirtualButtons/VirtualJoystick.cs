@@ -9,7 +9,7 @@ public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     private void Awake()
     {
-        _onScreenStick = GetComponent<OnScreenStick>();
+        _onScreenStick = GetComponentInChildren<OnScreenStick>();
     }
 
     public void OnPointerDown(PointerEventData eventData)
