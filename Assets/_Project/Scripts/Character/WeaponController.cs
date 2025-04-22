@@ -13,6 +13,7 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Transform _targetMarker;
     [SerializeField] private Rig _aimRig;
 
+    private Weapon _weapon;
     private Transform _weaponLeftHandAttachTransform;
     private Transform _weaponLeftHandHintTransform;
     
@@ -38,6 +39,12 @@ public class WeaponController : MonoBehaviour
     {
         _targetMarker.position = targetTransform.position;
         _aimRig.weight = 1f;
+
+        Vector3 directionToTarget = (targetTransform.position - _weapon.transform.position).normalized;
+        if (Vector3.Angle(_weapon.transform.forward, directionToTarget) < 5f)
+        {
+            _weapon.Shoot();
+        }
     }
 
     public void StopAiming()
@@ -60,11 +67,13 @@ public class WeaponController : MonoBehaviour
         {
             case WeaponType.Shotgun:
                 _shotgun.SetActive(true);
+                _weapon = _shotgun.GetComponent<Weapon>();
                 _weaponLeftHandAttachTransform = _shotgun.transform.GetChild(0).transform;
                 _weaponLeftHandHintTransform = _shotgun.transform.GetChild(1).transform;
                 break;
             case WeaponType.SniperRifle:
                 _sniperRifle.SetActive(true);
+                _weapon = _sniperRifle.GetComponent<Weapon>();
                 _weaponLeftHandAttachTransform = _sniperRifle.transform.GetChild(0).transform;
                 _weaponLeftHandHintTransform = _sniperRifle.transform.GetChild(1).transform;
                 break;

@@ -1997,6 +1997,14 @@ PrefabInstance:
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
       objectReference: {fileID: 1528370248}
+    - target: {fileID: 7291408296773796484, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: _shootDelay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7295375304413227067, guid: beecc60259940fb4883c123adc4e992f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8739115694115429621, guid: beecc60259940fb4883c123adc4e992f, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
