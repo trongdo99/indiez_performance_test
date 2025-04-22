@@ -56,7 +56,7 @@ public abstract class WeaponBase : MonoBehaviour
             if (hit.transform.TryGetComponent(out Health health))
             {
                 Debug.Log($"Hit: {hit.transform.name}");
-                health.ChangeHealth(_damageToHealth);
+                health.TryChangeHealth(_damageToHealth);
             }
         }
         
