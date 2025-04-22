@@ -107,13 +107,14 @@ MonoBehaviour:
   _bulletSpawnPosition: {fileID: 1330581099540903662}
   _bulletTrail: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
   _muzzleFlash: {fileID: 8100396107369772786}
+  _damageToHealth: -10
   _shootDelay: 1
   _speed: 100
   _missDistance: 100
   _spread: {x: 0.3, y: 0.15}
-  _targetableLayerMask:
+  _collidableLayerMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 128
   _bulletsPerShoot: 10
 --- !u!1 &1499018300189918
 GameObject:
