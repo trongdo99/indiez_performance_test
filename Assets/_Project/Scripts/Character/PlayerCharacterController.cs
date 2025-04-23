@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class CharacterMovementController : MonoBehaviour
+public class PlayerCharacterController : MonoBehaviour
 {
     [SerializeField] private float _maxMoveSpeed = 5f;
     [SerializeField] private float _movementSharpness = 15f;
