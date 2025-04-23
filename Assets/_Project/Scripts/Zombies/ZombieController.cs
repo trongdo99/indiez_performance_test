@@ -16,10 +16,14 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private Transform _target;
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
+    [SerializeField] private Collider _targetCollider;
+    
     [SerializeField] private float _attackRange = 1.5f;
     [SerializeField] private float _rotationSpeedWhileAttacking = 5f;
     [SerializeField] private float _attackCoolDown = 2f;
     [SerializeField] private float _damageToHealth = -20f;
+    
+    [SerializeField] private bool _debugDummy;
 
     private ZombieState _currentState = ZombieState.Idle;
     private ZombieDissolveEffect _dissolveEffect;
@@ -55,6 +59,8 @@ public class ZombieController : MonoBehaviour
 
     private void Update()
     {
+        if (_debugDummy) return;
+        
         if (_health.IsDead)
         {
             SetState(ZombieState.Dead);
@@ -96,6 +102,7 @@ public class ZombieController : MonoBehaviour
                 break;
             case ZombieState.Dead:
                 _collider.enabled = false;
+                _targetCollider.enabled = false;
                 _agent.isStopped = true;
                 _animator.SetTrigger(AnimatorParameters.ZombieDie);
                 break;
