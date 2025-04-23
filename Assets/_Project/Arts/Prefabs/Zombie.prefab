@@ -202,7 +202,7 @@ MonoBehaviour:
   _rotationSpeedWhileAttacking: 5
   _attackCoolDown: 2
   _damageToHealth: -20
-  _debugDummy: 1
+  _debugDummy: 0
 --- !u!114 &4740567500163695011
 MonoBehaviour:
   m_ObjectHideFlags: 0

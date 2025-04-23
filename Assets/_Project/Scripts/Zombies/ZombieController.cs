@@ -80,6 +80,11 @@ public class ZombieController : MonoBehaviour
         }
     }
 
+    public void SetTarget(Transform target)
+    {
+        _target = target;
+    }
+
     private void SetState(ZombieState newState, bool force = false)
     {
         if (!force && _currentState == newState ) return;
