@@ -2,11 +2,18 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController), typeof(CharacterAnimatorController), typeof(Health))]
+[RequireComponent(typeof(CharacterController), typeof(Health))]
 public class PlayerCharacterController : MonoBehaviour
 {
     public event Action OnDeath;
     public event Action OnDeathAnimationComplete;
+    
+    public enum PlayerState
+    {
+        Idle,
+        Moving,
+        Dead
+    }
     
     [SerializeField] private float _maxMoveSpeed = 5f;
     [SerializeField] private float _movementSharpness = 15f;
@@ -26,6 +33,8 @@ public class PlayerCharacterController : MonoBehaviour
     public Vector3 CurrentVelocity => _characterController.velocity;
     private Vector3 _currentVelocity;
     private Quaternion _currentRotation;
+    
+    private PlayerState _currentState = PlayerState.Idle;
     
     public bool IsAlive => !_health.IsDead;
 
@@ -49,33 +58,37 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void Update()
     {
-        Vector3 targetVelocity = _cameraRelativeInput.normalized * _maxMoveSpeed;
-        
-        if (_boundaryConstraint != null)
+        if (_health.IsDead)
         {
-            targetVelocity = _boundaryConstraint.ConstrainVelocityToBounds(targetVelocity);
+            SetState(PlayerState.Dead);
         }
-        
-        _currentVelocity = Vector3.Lerp(_currentVelocity, targetVelocity,
-            1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
-        
-        // Apply gravity.
-        if (!_characterController.isGrounded)
+
+        switch (_currentState)
         {
-            _currentVelocity -= _characterController.transform.up * _gravity;
+            case PlayerState.Idle:
+                HandleIdle();
+                break;
+            case PlayerState.Moving:
+                HandleMoving();
+                break;
+            case PlayerState.Dead:
+                // No logic
+                break;
         }
-        
-        _characterController.Move(_currentVelocity * Time.deltaTime);
     }
 
     private void LateUpdate()
     {
-        // RotateTowardMovementDirection();
-        RotateTowardTargetDirection();
+        if (_currentState != PlayerState.Dead)
+        {
+            RotateTowardTargetDirection();
+        }
     }
 
     public void SetMoveInput(Vector2 moveInput)
     {
+        if (_currentState == PlayerState.Dead) return;
+        
         _moveInput = moveInput;
         
         Vector3 forward = _camera.transform.TransformDirection(Vector3.forward);
@@ -90,39 +103,104 @@ public class PlayerCharacterController : MonoBehaviour
         }
         
         _cameraRelativeInput = cameraRelativeInput;
+        
+        // Update state based on movement input
+        if (_cameraRelativeInput.magnitude > 0.01f)
+        {
+            SetState(PlayerState.Moving);
+        }
+        else
+        {
+            SetState(PlayerState.Idle);
+        }
     }
 
     public void SetLookInput(Vector2 lookInput)
     {
+        if (_currentState == PlayerState.Dead) return;
+        
         _lookInput = lookInput;
     }
-
-    private void RotateTowardMovementDirection()
+    
+    private void SetState(PlayerState newState, bool force = false)
     {
-        var movementVector = new Vector3(_currentVelocity.x, 0f, _currentVelocity.z);
-        if (movementVector.magnitude > 0.01f)
+        if (!force && _currentState == newState) return;
+        
+        Debug.Log($"Player state changed from {_currentState} to {newState}");
+        _currentState = newState;
+
+        switch (_currentState)
         {
-            Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, movementVector, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
-            _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
+            case PlayerState.Idle:
+                _animator.SetFloat(AnimatorParameters.VelocityX, 0f);
+                _animator.SetFloat(AnimatorParameters.VelocityZ, 0f);
+                break;
+                
+            case PlayerState.Moving:
+                // No logic
+                break;
+                
+            case PlayerState.Dead:
+                _animator.SetTrigger(AnimatorParameters.Die);
+                OnDeath?.Invoke();
+                break;
+        }
+    }
+
+    private void HandleIdle()
+    {
+        ApplyGravity();
+        
+        _currentVelocity = Vector3.Lerp(_currentVelocity, Vector3.zero,
+            1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
+        
+        _characterController.Move(_currentVelocity * Time.deltaTime);
+    }
+
+    private void HandleMoving()
+    {
+        Vector3 targetVelocity = _cameraRelativeInput.normalized * _maxMoveSpeed;
+        
+        if (_boundaryConstraint != null)
+        {
+            targetVelocity = _boundaryConstraint.ConstrainVelocityToBounds(targetVelocity);
         }
         
-        transform.rotation = _currentRotation;
+        _currentVelocity = Vector3.Lerp(_currentVelocity, targetVelocity,
+            1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
+        
+        ApplyGravity();
+        
+        _characterController.Move(_currentVelocity * Time.deltaTime);
+        
+        _animator.SetFloat(AnimatorParameters.VelocityX, _currentVelocity.x);
+        _animator.SetFloat(AnimatorParameters.VelocityZ, _currentVelocity.z);
+    }
+    
+    private void ApplyGravity()
+    {
+        if (!_characterController.isGrounded)
+        {
+            _currentVelocity -= _characterController.transform.up * (_gravity * Time.deltaTime);
+        }
     }
 
     private void RotateTowardTargetDirection()
     {
         Vector3 targetDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
-        Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, targetDirection, 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
-        _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
-        transform.rotation = _currentRotation;
+        
+        if (targetDirection.magnitude > 0.01f)
+        {
+            Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, targetDirection, 
+                1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
+            _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
+            transform.rotation = _currentRotation;
+        }
     }
     
     private void HandlePlayerHealthReachedZero()
     {
-        _health.OnHealthReachedZero -= HandlePlayerHealthReachedZero;
-        
-        _animator.SetTrigger(AnimatorParameters.Die);
-        OnDeath?.Invoke();
+        SetState(PlayerState.Dead);
     }
 
     private void HandleAnimationDieCompleted()
