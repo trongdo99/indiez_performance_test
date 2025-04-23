@@ -15,7 +15,7 @@ TagManager:
   - UI
   - Targetable
   - BulletCollidable
-  - Ground
+  - NavMesh
   - 
   - 
   - 
