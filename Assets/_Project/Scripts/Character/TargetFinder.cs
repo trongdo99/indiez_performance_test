@@ -65,16 +65,16 @@ public class TargetFinder : MonoBehaviour
         
         Transform bestTarget = null;
         float closestDistance = Mathf.Infinity;
+        float minDot = Mathf.Cos(_coneAngle * 0.5f * Mathf.Deg2Rad);
 
         foreach (Collider hit in hits)
         {
             Vector3 toTarget = hit.transform.position - transform.position;
-            
+            Vector3 flatToTarget = new Vector3(toTarget.x, 0f, toTarget.z).normalized;
             float distance = toTarget.magnitude;
-            if (distance > _detectionRadius) continue;
-
-            float angle = Vector3.Angle(aimDirection, toTarget.normalized);
-            if (angle > _coneAngle / 2) continue;
+            float dot = Vector3.Dot(aimDirection, flatToTarget);
+            
+            if (dot < minDot) continue;
 
             if (distance < closestDistance)
             {
@@ -95,7 +95,7 @@ public class TargetFinder : MonoBehaviour
     
     private void DrawCone(Vector3 aimDirection)
     {
-        var rayCount = 20;
+        var rayCount = 50;
 
         Vector3 origin = transform.position;
 
