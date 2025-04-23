@@ -13,7 +13,6 @@ public class ZombieController : MonoBehaviour
         Dead,
     }
     
-    [SerializeField] private Transform _target;
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
     [SerializeField] private Collider _targetCollider;
@@ -32,6 +31,8 @@ public class ZombieController : MonoBehaviour
     private NavMeshAgent _agent;
     private Collider _collider;
     private float _lastAttackTime;
+    private Transform _target;
+    private Health _targetHealth;
 
     private void Start()
     {
@@ -83,6 +84,15 @@ public class ZombieController : MonoBehaviour
     public void SetTarget(Transform target)
     {
         _target = target;
+
+        if (_target != null)
+        {
+            _targetHealth = _target.GetComponent<Health>();
+        }
+        else
+        {
+            _targetHealth = null;
+        }
     }
 
     private void SetState(ZombieState newState, bool force = false)
@@ -124,7 +134,7 @@ public class ZombieController : MonoBehaviour
 
     private void HandleChasing()
     {
-        if (_target == null)
+        if (IsTargetDead())
         {
             SetState(ZombieState.Idle);
             return;
@@ -144,7 +154,7 @@ public class ZombieController : MonoBehaviour
 
     private void RotateTowardsTarget()
     {
-        if (_target == null)
+        if (IsTargetDead())
         {
             SetState(ZombieState.Idle);
             return;
@@ -158,14 +168,19 @@ public class ZombieController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * _rotationSpeedWhileAttacking);
     }
 
+    private bool IsTargetDead()
+    {
+        return _target == null || (_targetHealth != null && _targetHealth.IsDead);
+    }
+
     private void HandleAttackingAnimationCompleted()
     {
         if (_health.IsDead) return;
-        
-        if (_target == null)
+
+        if (IsTargetDead())
         {
             SetState(ZombieState.Idle);
-            return;       
+            return;
         }
         
         float distance = Vector3.Distance(transform.position, _target.position);
