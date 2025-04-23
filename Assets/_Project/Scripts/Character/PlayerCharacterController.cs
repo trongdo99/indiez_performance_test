@@ -10,6 +10,7 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private float _gravity = 30f;
     
     private CharacterController _characterController;
+    private PlayerBoundaryConstraint _boundaryConstraint;
     private Camera _camera;
 
     private Vector2 _moveInput;
@@ -22,6 +23,7 @@ public class PlayerCharacterController : MonoBehaviour
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+        _boundaryConstraint = GetComponent<PlayerBoundaryConstraint>();
     }
 
     private void Start()
@@ -33,6 +35,12 @@ public class PlayerCharacterController : MonoBehaviour
     private void Update()
     {
         Vector3 targetVelocity = _cameraRelativeInput.normalized * _maxMoveSpeed;
+        
+        if (_boundaryConstraint != null)
+        {
+            targetVelocity = _boundaryConstraint.ConstrainVelocityToBounds(targetVelocity);
+        }
+        
         _currentVelocity = Vector3.Lerp(_currentVelocity, targetVelocity,
             1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
         

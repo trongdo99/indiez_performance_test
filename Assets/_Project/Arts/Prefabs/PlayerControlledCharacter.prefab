@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 1070711667495179405}
   - component: {fileID: 8089014164323046394}
   - component: {fileID: 3921208937600604796}
+  - component: {fileID: 5406183856837540561}
   m_Layer: 0
   m_Name: PlayerControlledCharacter
   m_TagString: PlayerCharacter
@@ -124,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 3875818872517957334}
-  _characterMovementController: {fileID: 8622490096216009121}
+  _playerCharacterController: {fileID: 8622490096216009121}
 --- !u!114 &1070711667495179405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,6 +176,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
+--- !u!114 &5406183856837540561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4916213645624812614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01800af748e761a43acfb7c771cf81aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _levelBounds: {fileID: 0}
+  _boundaryPushForce: 10
+  _boundaryBuffer: 0.5
 --- !u!1001 &3791321915592483218
 PrefabInstance:
   m_ObjectHideFlags: 0

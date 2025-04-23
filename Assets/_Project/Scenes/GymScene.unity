@@ -525,7 +525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _input: {fileID: 11400000, guid: 2479ab6b900104ac2a479dc13477fecd, type: 2}
-  _characterMovementController: {fileID: 200702663}
+  _playerCharacterController: {fileID: 200702663}
 --- !u!4 &623993692
 Transform:
   m_ObjectHideFlags: 0
@@ -533,6 +533,75 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 623993690}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &636857927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 636857930}
+  - component: {fileID: 636857929}
+  - component: {fileID: 636857928}
+  m_Layer: 0
+  m_Name: LevelBoundary
+  m_TagString: LevelBoundary
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &636857928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636857927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff90ce1eecdc83248bec2d83e80e8264, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _boundaryColor: {r: 0, g: 1, b: 0, a: 0.2}
+  _lineWidth: 0.1
+  _createVisualMesh: 0
+--- !u!65 &636857929
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636857927}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 100, y: 100, z: 100}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &636857930
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636857927}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1492,7 +1561,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1592287303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1834,6 +1903,7 @@ GameObject:
   - component: {fileID: 1838470133}
   - component: {fileID: 1838470132}
   - component: {fileID: 1838470134}
+  - component: {fileID: 1838470135}
   m_Layer: 0
   m_Name: PlayerTopDownCamera
   m_TagString: Untagged
@@ -1918,6 +1988,20 @@ MonoBehaviour:
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
   FollowOffset: {x: 0, y: 6.55, z: -4.97}
+--- !u!114 &1838470135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838470130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d75924d76b05344aa410607bc57db98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BoundingVolume: {fileID: 636857929}
+  SlowingDistance: 0
 --- !u!1 &1865786109
 GameObject:
   m_ObjectHideFlags: 0
@@ -2190,6 +2274,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerControlledCharacter
       objectReference: {fileID: 0}
+    - target: {fileID: 5406183856837540561, guid: 7a5770b99a1c37946a34df95e5adecd6, type: 3}
+      propertyPath: _levelBounds
+      value: 
+      objectReference: {fileID: 636857929}
     - target: {fileID: 5610051775978650983, guid: 7a5770b99a1c37946a34df95e5adecd6, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
@@ -2220,3 +2308,4 @@ SceneRoots:
   - {fileID: 1984440042052247509}
   - {fileID: 1528370248}
   - {fileID: 1754437039}
+  - {fileID: 636857930}
