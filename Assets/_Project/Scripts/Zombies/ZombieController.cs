@@ -44,7 +44,7 @@ public class ZombieController : MonoBehaviour
         _hitBox.OnPlayerHit += DoDamage;
         _animationEventProxy.OnAttackAnimationCompleted += HandleAttackingAnimationCompleted;
         _animationEventProxy.OnDieAnimationCompleted += HandleDieAnimationCompleted;
-        _health.OnDeath += HandleOnDeath;
+        _health.OnHealthReachedZero += HandleOnHealthReachedZero;
         _dissolveEffect.OnDissolveCompleted += HandleOnDissolveCompleted;
     }
 
@@ -53,7 +53,7 @@ public class ZombieController : MonoBehaviour
         _hitBox.OnPlayerHit -= DoDamage;
         _animationEventProxy.OnAttackAnimationCompleted -= HandleAttackingAnimationCompleted;
         _animationEventProxy.OnDieAnimationCompleted -= HandleDieAnimationCompleted;
-        _health.OnDeath -= HandleOnDeath;
+        _health.OnHealthReachedZero -= HandleOnHealthReachedZero;
         _dissolveEffect.OnDissolveCompleted -= HandleOnDissolveCompleted;
     }
 
@@ -144,6 +144,11 @@ public class ZombieController : MonoBehaviour
 
     private void RotateTowardsTarget()
     {
+        if (_target == null)
+        {
+            SetState(ZombieState.Idle);
+            return;
+        }
         Vector3 direction = (_target.position - transform.position).normalized;
         direction.y = 0f;
 
@@ -155,8 +160,13 @@ public class ZombieController : MonoBehaviour
 
     private void HandleAttackingAnimationCompleted()
     {
-        Debug.Log("Attack complete");
         if (_health.IsDead) return;
+        
+        if (_target == null)
+        {
+            SetState(ZombieState.Idle);
+            return;       
+        }
         
         float distance = Vector3.Distance(transform.position, _target.position);
         if (distance <= _attackRange)
@@ -175,7 +185,7 @@ public class ZombieController : MonoBehaviour
         _dissolveEffect.StartDissolveEffect();
     }
 
-    private void HandleOnDeath()
+    private void HandleOnHealthReachedZero()
     {
         SetState(ZombieState.Dead);
     }

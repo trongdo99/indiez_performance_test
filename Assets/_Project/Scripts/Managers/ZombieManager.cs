@@ -64,7 +64,7 @@ public class ZombieManager : MonoBehaviour
 
         if (zombieController.TryGetComponent(out Health health))
         {
-            health.OnDeath += () => HandleZombieDeath(zombieController);
+            health.OnHealthReachedZero += () => HandleZombieDeath(zombieController);
         }
         
         Debug.Log($"Spawned {selectedType.TypeName} zombie at {position}");

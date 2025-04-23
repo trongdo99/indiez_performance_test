@@ -7,11 +7,6 @@ public class CharacterAnimatorController : MonoBehaviour
     [SerializeField] private Animator _animator;
     [FormerlySerializedAs("_characterMovementController")] [SerializeField] private PlayerCharacterController _playerCharacterController;
 
-    private void Awake()
-    {
-        _animator.fireEvents = false;
-    }
-
     private void LateUpdate()
     {
         Vector3 currentVelocity = _playerCharacterController.CurrentVelocity.normalized;

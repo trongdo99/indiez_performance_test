@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public event Action OnDeath;
+    public event Action OnHealthReachedZero;
     
     [SerializeField] private float _maxHealth = 100f;
     
@@ -28,9 +28,8 @@ public class Health : MonoBehaviour
 
         if (_currentHealth <= 0)
         {
-            Debug.Log($"GameObject {gameObject.name} died");
             _isDead = true;
-            OnDeath?.Invoke();
+            OnHealthReachedZero?.Invoke();
         }
     }
 }

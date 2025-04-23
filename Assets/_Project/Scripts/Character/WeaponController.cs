@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerCharacterController))]
 public class WeaponController : MonoBehaviour
 {
     [SerializeField] private WeaponType _currentWeapon;
@@ -12,14 +13,28 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Transform _leftHandIkHintTransform;
     [SerializeField] private Transform _targetMarker;
     [SerializeField] private Rig _aimRig;
+    [SerializeField] private Rig _handsRig;
 
+    private PlayerCharacterController _characterController;
     private WeaponBase _weaponBase;
     private Transform _weaponLeftHandAttachTransform;
     private Transform _weaponLeftHandHintTransform;
-    
+
+    private void Awake()
+    {
+        _characterController = GetComponent<PlayerCharacterController>();
+    }
+
     private void Start()
     {
         SetUpWeapon(_currentWeapon);
+
+        _characterController.OnDeath += HandlePlayerOnDeath;
+    }
+
+    private void OnDestroy()
+    {
+        _characterController.OnDeath -= HandlePlayerOnDeath;
     }
 
     private void Update()
@@ -91,5 +106,11 @@ public class WeaponController : MonoBehaviour
                 _sniperRifle.SetActive(false);
                 break;
         }
+    }
+
+    private void HandlePlayerOnDeath()
+    {
+        _aimRig.weight = 0f;
+        _handsRig.weight = 0f;
     }
 }

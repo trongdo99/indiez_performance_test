@@ -149,7 +149,7 @@ public class ZombieSpawnManager : MonoBehaviour
         _activeWaveZombies.Add(zombie);
         if (zombie.TryGetComponent(out Health health))
         {
-            health.OnDeath += () =>
+            health.OnHealthReachedZero += () =>
             {
                 HandleZombieDeath(zombie, currentWave);
             };

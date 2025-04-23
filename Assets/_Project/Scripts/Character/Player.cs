@@ -1,26 +1,23 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private InputReader _input;
-    [FormerlySerializedAs("_characterMovementController")] [SerializeField] private PlayerCharacterController _playerCharacterController;
+    [SerializeField] private GameObject _playerCharacterPrefab;
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private CinemachineCamera _topDownCamera;
     
-    public Transform PlayerCharacterTransform => _playerCharacterTransform;
-    private Transform _playerCharacterTransform;
+    private PlayerCharacterController _playerCharacterController;
+    public Transform PlayerCharacterTransform => _playerCharacterController.transform;
 
     private void Start()
     {
         _input.EnablePlayerActions();
         
-        // Find a way to get the ref to CharacterMovementController in proper way later.
-        if (_playerCharacterController == null)
-        {
-            _playerCharacterController = GameObject.FindFirstObjectByType<PlayerCharacterController>();
-        }
-        
-        _playerCharacterTransform = _playerCharacterController.transform;
+        SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);;
     }
 
     private void Update()
@@ -30,5 +27,55 @@ public class Player : MonoBehaviour
             _playerCharacterController.SetMoveInput(_input.MoveInput);
             _playerCharacterController.SetLookInput(_input.LookInput);
         }
+    }
+
+    public void SpawnPlayerCharacter(Vector3 position, Quaternion rotation)
+    {
+        if (_playerCharacterController != null)
+        {
+            DestroyPlayerCharacter();
+        }
+        
+        GameObject playerCharacterObj = Instantiate(_playerCharacterPrefab, position, rotation);
+        _playerCharacterController = playerCharacterObj.GetComponent<PlayerCharacterController>();
+
+        if (_playerCharacterController == null)
+        {
+            Debug.LogError("PlayerCharacterController isn't found on player prefab");
+            Destroy(playerCharacterObj);
+            return;
+        }
+        
+        _topDownCamera.Follow = _playerCharacterController.transform;
+
+        _playerCharacterController.OnDeath += HandlePlayerCharacterDeath;
+        _playerCharacterController.OnDeathAnimationComplete += HandlePlayerAnimationDeathComplete;
+    }
+
+    public void DestroyPlayerCharacter()
+    {
+        if (_playerCharacterController == null) return;
+        
+        _playerCharacterController.OnDeath -= HandlePlayerCharacterDeath;
+        _playerCharacterController.OnDeathAnimationComplete -= HandlePlayerAnimationDeathComplete;
+        
+        Destroy(_playerCharacterController.gameObject);
+        _playerCharacterController = null;
+    }
+
+    private void RespawnPlayerCharacter()
+    {
+        SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
+    }
+
+    private void HandlePlayerCharacterDeath()
+    {
+        // noop
+    }
+
+    private void HandlePlayerAnimationDeathComplete()
+    {
+        // For now, respawn at spawn point after 3 seconds
+        Invoke("RespawnPlayerCharacter", 3f);
     }
 }
