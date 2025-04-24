@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class ZombieManager : MonoBehaviour
+public class ZombieManager : MonoBehaviour, IInitializable
 {
     public static ZombieManager Instance { get; private set; }
 
@@ -28,12 +29,17 @@ public class ZombieManager : MonoBehaviour
     private List<ZombieController> _activeZombies = new List<ZombieController>();
     private Transform _playerTransform;
 
-    private void Start()
+    public async Task Initialize(IProgress<float> progress = null)
     {
-        _playerTransform = GameObject.FindGameObjectWithTag("PlayerCharacter")?.transform;
-        if (_playerTransform == null)
+        progress?.Report(1f);
+    }
+
+    public void SetPlayerCharacterTransform(Transform playerTransform)
+    {
+        _playerTransform = playerTransform;
+        foreach (ZombieController zombie in _activeZombies)
         {
-            Debug.LogError("Player not found");
+            zombie.SetTarget(_playerTransform);
         }
     }
 

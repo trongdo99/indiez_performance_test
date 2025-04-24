@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IInitializable
 {
     [SerializeField] private InputReader _input;
     [SerializeField] private GameObject _playerCharacterPrefab;
@@ -13,11 +14,14 @@ public class Player : MonoBehaviour
     private PlayerCharacterController _playerCharacterController;
     public Transform PlayerCharacterTransform => _playerCharacterController.transform;
 
-    private void Start()
+    public async Task Initialize(IProgress<float> progress = null)
     {
-        _input.EnablePlayerActions();
+        progress?.Report(0f);
         
-        SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);;
+        _input.EnablePlayerActions();
+        SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
+
+        progress?.Report(1f);
     }
 
     private void Update()
@@ -46,10 +50,14 @@ public class Player : MonoBehaviour
             return;
         }
         
-        _topDownCamera.Follow = _playerCharacterController.transform;
-
         _playerCharacterController.OnDeath += HandlePlayerCharacterDeath;
         _playerCharacterController.OnDeathAnimationComplete += HandlePlayerAnimationDeathComplete;
+    }
+
+    public void SetupPlayerFollowCamera(CinemachineCamera topDownCamera)
+    {
+        _topDownCamera = topDownCamera;
+        _topDownCamera.Follow = _playerCharacterController.transform;
     }
 
     public void DestroyPlayerCharacter()

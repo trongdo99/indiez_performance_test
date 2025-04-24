@@ -6,16 +6,18 @@ using UnityEngine.UI;
 
 public class SceneLoader : MonoBehaviour
 {
-    [SerializeField] private Image _loadingBar;
+    [SerializeField] private Slider _loadingBar;
     [SerializeField] private float _fillSpeed = 0.5f;
-    [SerializeField] private Canvas _loadingCanvas;
-    [SerializeField] private Camera _loadingCamera;
+    [SerializeField] private GameObject _loadingScreen;
     [SerializeField] private List<SceneData> _scenes;
+    [SerializeField] private float _sceneLoadWeight = 0.5f;
+    [SerializeField] private float _maxWaitTime = 3f;
 
+    private GameInitializer _gameInitializer;
     private float _targetProgress;
     private bool _isLoading;
     
-    public readonly GameSceneManager GameSceneManager = new GameSceneManager();
+    private readonly GameSceneManager _gameSceneManager = new GameSceneManager();
 
     private async void Start()
     {
@@ -43,15 +45,16 @@ public class SceneLoader : MonoBehaviour
     {
         if (!_isLoading) return;
         
-        float currentFillAmount = _loadingBar.fillAmount;
-        float progressDifference = Mathf.Abs(currentFillAmount - _targetProgress);
-        float dynamicFillSpeed = progressDifference * _fillSpeed;
-        _loadingBar.fillAmount = Mathf.Lerp(currentFillAmount, _targetProgress, Time.deltaTime * dynamicFillSpeed);
+        _loadingBar.value = Mathf.Lerp(_loadingBar.value, _targetProgress, Time.deltaTime * _fillSpeed);
+        if (Time.frameCount % 60 == 0) // Log once per second at 60fps
+        {
+            Debug.Log($"Loading progress: bar={_loadingBar.value:F2}, target={_targetProgress:F2}");
+        }
     }
 
     public async Task LoadSceneAsync(int index)
     {
-        _loadingBar.fillAmount = 0f;
+        _loadingBar.value = 0f;
         _targetProgress = 1f;
 
         if (index < 0 || index >= _scenes.Count)
@@ -60,19 +63,55 @@ public class SceneLoader : MonoBehaviour
             return;
         }
         
-        var loadingProgress = new LoadingProgress();
-        loadingProgress.Progressed += target => _targetProgress = Mathf.Max(target, _targetProgress);
+        var combinedProgress = new CombinedLoadingProgress(_sceneLoadWeight);
+        
+        var sceneLoadingProgress = new LoadingProgress();
+        sceneLoadingProgress.Progressed += target =>
+        {
+            combinedProgress.UpdateSceneProgress(target);
+            _targetProgress = combinedProgress.CombinedProgress;
+        };
         
         EnableLoadingCanvas();
-        await GameSceneManager.LoadScene(_scenes[index], loadingProgress);
+        
+        await _gameSceneManager.LoadScene(_scenes[index], sceneLoadingProgress);
+        
+        _gameInitializer = FindFirstObjectByType<GameInitializer>();
+        if (_gameInitializer == null)
+        {
+            Debug.Log("GameInitializer not found, proceeding without game initialization phase");
+            _targetProgress = 1f;
+        }
+        else
+        {
+            var initializationProgress = new LoadingProgress();
+            initializationProgress.Progressed += target =>
+            {
+                combinedProgress.UpdateInitProgress(target);
+                _targetProgress = combinedProgress.CombinedProgress;
+            };
+            
+            await _gameInitializer.InitializeGame(initializationProgress);
+        }
+
+        // Ensure the target is set to 1.0 at the end
+        _targetProgress = 1.0f;
+        
+        // Wait until the loading bar is almost full before proceeding
+        var waitTime = 0f;
+        while (_loadingBar.value < 0.99f && waitTime < _maxWaitTime)
+        {
+            await Task.Delay(50);
+            waitTime += 0.05f;
+        }
+        
         EnableLoadingCanvas(false);
     }
 
     private void EnableLoadingCanvas(bool enable = true)
     {
         _isLoading = enable;
-        _loadingCanvas.gameObject.SetActive(enable);
-        _loadingCamera.gameObject.SetActive(enable);
+        _loadingScreen.SetActive(enable);
     }
 
     private int FindSceneIndexByPath(string path)
@@ -86,6 +125,39 @@ public class SceneLoader : MonoBehaviour
     }
 }
 
+public class CombinedLoadingProgress
+{
+    private float _sceneProgress;
+    private float _initProgress;
+    private readonly float _sceneWeight;
+    private readonly float _initWeight;
+    
+    public float CombinedProgress { get; private set; }
+
+    public CombinedLoadingProgress(float sceneWeight = 0.5f)
+    {
+        _sceneWeight = sceneWeight;
+        _initWeight = 1f - sceneWeight;
+    }
+
+    public void UpdateSceneProgress(float progress)
+    {
+        _sceneProgress = progress;
+        UpdateCombinedProgress();
+    }
+
+    public void UpdateInitProgress(float progress)
+    {
+        _initProgress = progress;
+        UpdateCombinedProgress();
+    }
+
+    private void UpdateCombinedProgress()
+    {
+        CombinedProgress = (_sceneProgress * _sceneWeight) + (_initProgress * _initWeight);
+    }
+}
+
 public class LoadingProgress : IProgress<float>
 {
     public event Action<float> Progressed;
@@ -94,6 +166,7 @@ public class LoadingProgress : IProgress<float>
 
     public void Report(float value)
     {
+        value = Mathf.Clamp01(value);
         Progressed?.Invoke(value / Ratio);
     }
 }
