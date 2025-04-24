@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour, ISyncInitializable
 {
+    public event Action OnPlayerDeathAnimationCompleted;
+    
     [SerializeField] private InputReader _input;
     [SerializeField] private GameObject _playerCharacterPrefab;
     [SerializeField] private Transform _spawnPoint;
@@ -81,7 +83,6 @@ public class Player : MonoBehaviour, ISyncInitializable
 
     private void HandlePlayerAnimationDeathComplete()
     {
-        // For now, respawn at spawn point after 3 seconds
-        Invoke("RespawnPlayerCharacter", 3f);
+        OnPlayerDeathAnimationCompleted?.Invoke();
     }
 }

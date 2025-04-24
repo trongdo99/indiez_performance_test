@@ -115,10 +115,21 @@ public class GameInitializer : MonoBehaviour
     private void SetupDependencies()
     {
         Debug.Log("Setting up dependencies ...");
+        
+        // GameUIManager
         _gameUIManager.SetGameplayManager(_gameplayManager);
+        _gameUIManager.SetPlayer(_player);
+        
+        // topDownCamera
         _topDownCamera.GetComponent<CinemachineConfiner3D>().BoundingVolume = _levelBoundary;
+        
+        // Player
         _player.SetupPlayerFollowCamera(_topDownCamera);
+        
+        // ZombieManager
         _zombieManager.SetPlayerCharacterTransform(_player.PlayerCharacterTransform);
+        
+        // ZombieSpawnManager
         _zombieSpawnManager.SetGameplayManager(_gameplayManager);
     }
 

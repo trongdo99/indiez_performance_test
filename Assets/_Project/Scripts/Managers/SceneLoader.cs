@@ -24,7 +24,9 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private List<SceneData> _scenes;
     [SerializeField] private float _sceneLoadWeight = 0.5f;
     [SerializeField] private float _maxWaitTime = 3f;
+    
 
+    private int _currentSceneIndex;
     private GameInitializer _gameInitializer;
     private float _targetProgress;
     private bool _isLoading;
@@ -71,6 +73,8 @@ public class SceneLoader : MonoBehaviour
             return;
         }
         
+        _currentSceneIndex = index;
+        
         var progressSystem = new LoadingProgressSystem(_sceneLoadWeight);
         progressSystem.OnProgressChanged += (progress) =>
         {
@@ -106,6 +110,11 @@ public class SceneLoader : MonoBehaviour
         }
         
         EnableLoadingCanvas(false);
+    }
+
+    public async Task ReloadCurrentSceneAsync()
+    {
+        await LoadSceneAsync(_currentSceneIndex);
     }
 
     private void EnableLoadingCanvas(bool enable = true)

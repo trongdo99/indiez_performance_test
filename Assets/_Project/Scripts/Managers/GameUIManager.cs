@@ -1,16 +1,20 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
 public class GameUIManager : MonoBehaviour, ISyncInitializable
 {
+    [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private GameObject _gameplayHUD;
     [SerializeField] private GameObject _virtualButtons;
+    
     [SerializeField] private GameObject _countDownPanel;
     [SerializeField] private TMP_Text _countdownText;
     
     private GameplayManager _gameplayManager;
+    private Player _player;
     
     public void Initialize(IProgress<float> progress = null)
     {
@@ -26,12 +30,18 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     {
         _gameplayManager = gameplayManager;
     }
+    
+    public void SetPlayer(Player player)
+    {
+        _player = player;
+    }
 
     public void SubscribeToEvents()
     {
         _gameplayManager.OnGameStateChanged += HandleGameStateChanged;
         _gameplayManager.OnCountDownTick += HandleOnCountDownTick;
         _gameplayManager.OnCountDownCompleted += HandleOnCountDownCompleted;
+        _player.OnPlayerDeathAnimationCompleted += HandlePlayerDeathAnimationCompleted;
     }
 
     private void UnsubscribeFromEvents()
@@ -39,6 +49,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         _gameplayManager.OnCountDownTick -= HandleOnCountDownTick;
         _gameplayManager.OnCountDownCompleted -= HandleOnCountDownCompleted;
         _gameplayManager.OnGameStateChanged -= HandleGameStateChanged;
+        _player.OnPlayerDeathAnimationCompleted -= HandlePlayerDeathAnimationCompleted;
     }
 
     private void HandleGameStateChanged(GameplayManager.GameState newState, GameplayManager.GameState previousState)
@@ -54,11 +65,18 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
                 break;
         }
     }
+    
+    private void HandlePlayerDeathAnimationCompleted()
+    {
+        _gameplayHUD.SetActive(false);
+        _gameOverPanel.SetActive(true);
+    }
 
     private void HideAllUI()
     {
         _gameplayHUD.SetActive(false);
         _countDownPanel.SetActive(false);
+        _gameOverPanel.SetActive(false);
     }
     
     private void HandleOnCountDownTick(int seconds)
@@ -106,5 +124,29 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     private void HandleOnCountDownCompleted()
     {
         _countDownPanel.SetActive(false);
+    }
+
+    public async void UI_RestartButtonClicked()
+    {
+        try
+        {
+            await SceneLoader.Instance.ReloadCurrentSceneAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+    }
+    
+    public async void UI_MainMenuButtonClicked()
+    {
+        try
+        {
+            await SceneLoader.Instance.LoadSceneAsync(0);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
     }
 }
