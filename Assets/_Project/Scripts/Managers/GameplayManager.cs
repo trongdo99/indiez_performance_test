@@ -33,6 +33,7 @@ public class GameplayManager : MonoBehaviour, ISyncInitializable
     
     [SerializeField] private int _timeBeforeStart = 3;
     
+    private ZombieSpawnManager _zombieSpawnManager;
     private GameState _currentState = GameState.Loading;
     private float _pauseStartTime;
     private float _totalPausedTime;
@@ -43,10 +44,21 @@ public class GameplayManager : MonoBehaviour, ISyncInitializable
     {
         GameInitializer.OnInitializationComplete += HandleInitializationComplete;
     }
+    
+    public void SetZombieSpawnManager(ZombieSpawnManager zombieSpawnManager)
+    {
+        _zombieSpawnManager = zombieSpawnManager;
+    }
+
+    public void SubscribeToEvents()
+    {
+        _zombieSpawnManager.OnAllWavesCompleted += HandleAllWavesCompleted;
+    }
 
     private void OnDestroy()
     {
         GameInitializer.OnInitializationComplete -= HandleInitializationComplete;
+        _zombieSpawnManager.OnAllWavesCompleted -= HandleAllWavesCompleted;
 
         // Reset the game state in case the game was destroyed while paused
         Time.timeScale = 1f;
@@ -111,6 +123,8 @@ public class GameplayManager : MonoBehaviour, ISyncInitializable
             case GameState.PlayerDead:
                 break;
             case GameState.LevelCompleted:
+                // TODO: Reload the current scene for now
+                SceneLoader.Instance.ReloadCurrentSceneAsync();
                 break;
             case GameState.GameOver:
                 break;
@@ -135,6 +149,11 @@ public class GameplayManager : MonoBehaviour, ISyncInitializable
     private void HandleInitializationComplete()
     {
         SetGameState(GameState.Starting);
+    }
+
+    private void HandleAllWavesCompleted()
+    {
+        SetGameState(GameState.LevelCompleted);
     }
 
     private IEnumerator StartGameCountDown()

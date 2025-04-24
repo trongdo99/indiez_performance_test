@@ -6,8 +6,8 @@ using Random = UnityEngine.Random;
 
 public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 {
-    public static event Action OnAllWavesCompleted;
-    public static event Action<int> OnWaveCompleted;
+    public event Action OnAllWavesCompleted;
+    public event Action<int> OnWaveCompleted;
     
     [System.Serializable]
     public class SpawnPoint

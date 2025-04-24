@@ -116,6 +116,9 @@ public class GameInitializer : MonoBehaviour
     {
         Debug.Log("Setting up dependencies ...");
         
+        // GameplayManager
+        _gameplayManager.SetZombieSpawnManager(_zombieSpawnManager);
+        
         // GameUIManager
         _gameUIManager.SetGameplayManager(_gameplayManager);
         _gameUIManager.SetPlayer(_player);
@@ -136,6 +139,7 @@ public class GameInitializer : MonoBehaviour
     private void SetupEventsSubscriber()
     {
         Debug.Log("Setting up events subscriber ...");
+        _gameplayManager.SubscribeToEvents();
         _gameUIManager.SubscribeToEvents();
         _zombieSpawnManager.SubscribeToEvents();
     }
