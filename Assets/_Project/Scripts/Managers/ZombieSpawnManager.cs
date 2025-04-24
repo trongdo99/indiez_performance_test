@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ZombieSpawnManager : MonoBehaviour, IInitializable
+public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 {
     public static event Action OnAllWavesCompleted;
     public static event Action<int> OnWaveCompleted;
@@ -39,7 +39,7 @@ public class ZombieSpawnManager : MonoBehaviour, IInitializable
     private int _totalZombiesKilled;
     private int _totalZombiesSpawned;
 
-    public Task Initialize(IProgress<float> progress = null)
+    public void Initialize(IProgress<float> progress = null)
     {
         progress?.Report(0f);
 
@@ -49,11 +49,7 @@ public class ZombieSpawnManager : MonoBehaviour, IInitializable
             wave.ZombiesKilled = 0;
         }
 
-        progress?.Report(0.6f);
         GameInitializer.OnInitializationComplete += HandleInitializationComplete;
-        
-        progress?.Report(1f);
-        return null;
     }
 
     private void HandleInitializationComplete()

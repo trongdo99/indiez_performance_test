@@ -4,7 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Player : MonoBehaviour, IInitializable
+public class Player : MonoBehaviour, ISyncInitializable
 {
     [SerializeField] private InputReader _input;
     [SerializeField] private GameObject _playerCharacterPrefab;
@@ -14,15 +14,12 @@ public class Player : MonoBehaviour, IInitializable
     private PlayerCharacterController _playerCharacterController;
     public Transform PlayerCharacterTransform => _playerCharacterController.transform;
 
-    public Task Initialize(IProgress<float> progress = null)
+    public void Initialize(IProgress<float> progress = null)
     {
         progress?.Report(0f);
         
         _input.EnablePlayerActions();
         SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
-
-        progress?.Report(1f);
-        return null;
     }
 
     private void Update()

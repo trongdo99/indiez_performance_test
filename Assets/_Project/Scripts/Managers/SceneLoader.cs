@@ -6,6 +6,18 @@ using UnityEngine.UI;
 
 public class SceneLoader : MonoBehaviour
 {
+    public static SceneLoader Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     [SerializeField] private Slider _loadingBar;
     [SerializeField] private float _fillSpeed = 0.5f;
     [SerializeField] private GameObject _loadingScreen;

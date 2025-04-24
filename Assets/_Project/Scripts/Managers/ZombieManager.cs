@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ZombieManager : MonoBehaviour, IInitializable
+public class ZombieManager : MonoBehaviour, ISyncInitializable
 {
     public static ZombieManager Instance { get; private set; }
 
@@ -29,10 +29,9 @@ public class ZombieManager : MonoBehaviour, IInitializable
     private List<ZombieController> _activeZombies = new List<ZombieController>();
     private Transform _playerTransform;
 
-    public Task Initialize(IProgress<float> progress = null)
+    public void Initialize(IProgress<float> progress = null)
     {
-        progress?.Report(1f);
-        return null;
+        progress?.Report(0f);
     }
 
     public void SetPlayerCharacterTransform(Transform playerTransform)

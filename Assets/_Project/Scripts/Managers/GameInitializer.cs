@@ -131,10 +131,16 @@ public class GameInitializer : MonoBehaviour
             _managers[typeof(T)] = manager;
         }
         
-        if (managerObj.TryGetComponent(out IInitializable initializable))
+        if (managerObj.TryGetComponent(out IAsyncInitializable initializable))
         {
             var progressTracker= new ManagerProgressTracker(this, managerName);
             await initializable.Initialize(progressTracker);
+        }
+        else if (managerObj.TryGetComponent(out ISyncInitializable syncInitializable))
+        {
+            var progressTracker= new ManagerProgressTracker(this, managerName);
+            syncInitializable.Initialize(progressTracker);
+            progressTracker.Report(1f);
         }
         else
         {
@@ -241,7 +247,12 @@ public class GameInitializer : MonoBehaviour
     }
 }
 
-public interface IInitializable
+public interface IAsyncInitializable
 {
     public Task Initialize(IProgress<float> progress = null);
+}
+
+public interface ISyncInitializable
+{
+    public void Initialize(IProgress<float> progress = null);
 }
