@@ -46,10 +46,6 @@ public class SceneLoader : MonoBehaviour
         if (!_isLoading) return;
         
         _loadingBar.value = Mathf.Lerp(_loadingBar.value, _targetProgress, Time.deltaTime * _fillSpeed);
-        if (Time.frameCount % 60 == 0) // Log once per second at 60fps
-        {
-            Debug.Log($"Loading progress: bar={_loadingBar.value:F2}, target={_targetProgress:F2}");
-        }
     }
 
     public async Task LoadSceneAsync(int index)
@@ -63,18 +59,16 @@ public class SceneLoader : MonoBehaviour
             return;
         }
         
-        var combinedProgress = new CombinedLoadingProgress(_sceneLoadWeight);
-        
-        var sceneLoadingProgress = new LoadingProgress();
-        sceneLoadingProgress.Progressed += target =>
+        var progressSystem = new LoadingProgressSystem(_sceneLoadWeight);
+        progressSystem.OnProgressChanged += (progress) =>
         {
-            combinedProgress.UpdateSceneProgress(target);
-            _targetProgress = combinedProgress.CombinedProgress;
+            _targetProgress = progress;
         };
         
         EnableLoadingCanvas();
         
-        await _gameSceneManager.LoadScene(_scenes[index], sceneLoadingProgress);
+        IProgress<float> sceneProgressTracker = progressSystem.CreateSceneProgressTracker();
+        await _gameSceneManager.LoadScene(_scenes[index], sceneProgressTracker);
         
         _gameInitializer = FindFirstObjectByType<GameInitializer>();
         if (_gameInitializer == null)
@@ -84,14 +78,8 @@ public class SceneLoader : MonoBehaviour
         }
         else
         {
-            var initializationProgress = new LoadingProgress();
-            initializationProgress.Progressed += target =>
-            {
-                combinedProgress.UpdateInitProgress(target);
-                _targetProgress = combinedProgress.CombinedProgress;
-            };
-            
-            await _gameInitializer.InitializeGame(initializationProgress);
+            IProgress<float> initProgressTracker = progressSystem.CreateInitProgressTracker();
+            await _gameInitializer.InitializeGame(initProgressTracker);
         }
 
         // Ensure the target is set to 1.0 at the end
@@ -122,51 +110,5 @@ public class SceneLoader : MonoBehaviour
         }
 
         return -1;
-    }
-}
-
-public class CombinedLoadingProgress
-{
-    private float _sceneProgress;
-    private float _initProgress;
-    private readonly float _sceneWeight;
-    private readonly float _initWeight;
-    
-    public float CombinedProgress { get; private set; }
-
-    public CombinedLoadingProgress(float sceneWeight = 0.5f)
-    {
-        _sceneWeight = sceneWeight;
-        _initWeight = 1f - sceneWeight;
-    }
-
-    public void UpdateSceneProgress(float progress)
-    {
-        _sceneProgress = progress;
-        UpdateCombinedProgress();
-    }
-
-    public void UpdateInitProgress(float progress)
-    {
-        _initProgress = progress;
-        UpdateCombinedProgress();
-    }
-
-    private void UpdateCombinedProgress()
-    {
-        CombinedProgress = (_sceneProgress * _sceneWeight) + (_initProgress * _initWeight);
-    }
-}
-
-public class LoadingProgress : IProgress<float>
-{
-    public event Action<float> Progressed;
-
-    private const float Ratio = 1f;
-
-    public void Report(float value)
-    {
-        value = Mathf.Clamp01(value);
-        Progressed?.Invoke(value / Ratio);
     }
 }

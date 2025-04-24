@@ -23,7 +23,7 @@ public class GameInitializer : MonoBehaviour
     private GameInitializer _gameInitializer;
     private readonly Dictionary<string, float> _managerWeights = new Dictionary<string, float>();
     private readonly Dictionary<string, float> _managerContributions = new Dictionary<string, float>();
-    private LoadingProgress _loadingProgress;
+    private IProgress<float> _initProgress;
     private bool _isInitialized;
     private float _currentProgress;
     
@@ -43,7 +43,7 @@ public class GameInitializer : MonoBehaviour
         _managerWeights.Add("ZombieSpawnManager", 0.33f);
     }
 
-    public async Task InitializeGame(LoadingProgress loadingProgress = null)
+    public async Task InitializeGame(IProgress<float> initProgress = null)
     {
         if (_isInitialized)
         {
@@ -52,7 +52,7 @@ public class GameInitializer : MonoBehaviour
         }
 
         _isInitialized = true;
-        _loadingProgress = loadingProgress;
+        _initProgress = initProgress;
         _currentProgress = 0f;
         
         Debug.Log("Game initializing starting ...");
@@ -189,8 +189,7 @@ public class GameInitializer : MonoBehaviour
             }
         }
 
-        _loadingProgress?.Report(_currentProgress);
-        
+        _initProgress?.Report(_currentProgress);
         Debug.Log($"Progress: {_currentProgress:P0} - Manager: {managerName} ({managerProgress:P0})");
     }
 
@@ -223,10 +222,10 @@ public class GameInitializer : MonoBehaviour
         return calculatedProgress;
     }
 
-    public class ManagerProgressTracker : IProgress<float>
+    private class ManagerProgressTracker : IProgress<float>
     {
-        private GameInitializer _initializer;
-        private string _managerName;
+        private readonly GameInitializer _initializer;
+        private readonly string _managerName;
         
         public ManagerProgressTracker(GameInitializer initializer, string managerName)
         {
