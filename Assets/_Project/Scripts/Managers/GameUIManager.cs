@@ -142,7 +142,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     {
         try
         {
-            await SceneLoader.Instance.LoadSceneAsync(0);
+            await SceneLoader.Instance.LoadSceneAsync("MainMenu");
         }
         catch (Exception e)
         {

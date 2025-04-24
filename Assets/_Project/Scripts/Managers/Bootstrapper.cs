@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class Bootstrapper : MonoBehaviour
 {
-    public static Bootstrapper Instance { get; private set; }
 
     public static string ActiveScenePath
     {
@@ -24,17 +23,6 @@ public class Bootstrapper : MonoBehaviour
             EditorPrefs.SetString("ActiveScenePath", value);
 #endif
         }
-    }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private const int SceneIndex = 0;

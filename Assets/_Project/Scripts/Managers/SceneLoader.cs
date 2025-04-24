@@ -51,8 +51,8 @@ public class SceneLoader : MonoBehaviour
             }
         }
 #endif
-        
-        await LoadSceneAsync(0);
+
+        await LoadSceneAsync("MainMenu");
     }
 
     private void Update()
@@ -112,6 +112,18 @@ public class SceneLoader : MonoBehaviour
         EnableLoadingCanvas(false);
     }
 
+    public async Task LoadSceneAsync(string sceneName)
+    {
+        int sceneIndex = FindSceneIndexByName(sceneName);
+        if (sceneIndex < 0)
+        {
+            Debug.LogError($"Scene {sceneName} not found in _scenes list");
+            return;
+        }
+        
+        await LoadSceneAsync(sceneIndex);
+    }
+
     public async Task ReloadCurrentSceneAsync()
     {
         await LoadSceneAsync(_currentSceneIndex);
@@ -128,6 +140,16 @@ public class SceneLoader : MonoBehaviour
         for (var i = 0; i < _scenes.Count; i++)
         {
             if (_scenes[i].ScenePath.Equals(path)) return i;
+        }
+
+        return -1;
+    }
+
+    private int FindSceneIndexByName(string name)
+    {
+        for (var i = 0; i < _scenes.Count; i++)
+        {
+            if (_scenes[i].Name.Equals(name)) return i;
         }
 
         return -1;
