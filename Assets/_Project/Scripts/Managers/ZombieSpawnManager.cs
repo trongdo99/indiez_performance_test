@@ -39,7 +39,7 @@ public class ZombieSpawnManager : MonoBehaviour, IInitializable
     private int _totalZombiesKilled;
     private int _totalZombiesSpawned;
 
-    public async Task Initialize(IProgress<float> progress = null)
+    public Task Initialize(IProgress<float> progress = null)
     {
         progress?.Report(0f);
 
@@ -53,6 +53,7 @@ public class ZombieSpawnManager : MonoBehaviour, IInitializable
         GameInitializer.OnInitializationComplete += HandleInitializationComplete;
         
         progress?.Report(1f);
+        return null;
     }
 
     private void HandleInitializationComplete()

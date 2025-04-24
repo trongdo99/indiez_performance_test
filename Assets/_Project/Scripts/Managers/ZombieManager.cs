@@ -29,9 +29,10 @@ public class ZombieManager : MonoBehaviour, IInitializable
     private List<ZombieController> _activeZombies = new List<ZombieController>();
     private Transform _playerTransform;
 
-    public async Task Initialize(IProgress<float> progress = null)
+    public Task Initialize(IProgress<float> progress = null)
     {
         progress?.Report(1f);
+        return null;
     }
 
     public void SetPlayerCharacterTransform(Transform playerTransform)

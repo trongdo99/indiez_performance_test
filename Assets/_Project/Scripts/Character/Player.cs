@@ -14,7 +14,7 @@ public class Player : MonoBehaviour, IInitializable
     private PlayerCharacterController _playerCharacterController;
     public Transform PlayerCharacterTransform => _playerCharacterController.transform;
 
-    public async Task Initialize(IProgress<float> progress = null)
+    public Task Initialize(IProgress<float> progress = null)
     {
         progress?.Report(0f);
         
@@ -22,6 +22,7 @@ public class Player : MonoBehaviour, IInitializable
         SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
 
         progress?.Report(1f);
+        return null;
     }
 
     private void Update()
