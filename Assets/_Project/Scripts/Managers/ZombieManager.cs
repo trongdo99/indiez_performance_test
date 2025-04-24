@@ -14,7 +14,6 @@ public class ZombieManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     [System.Serializable]

@@ -5,12 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/_Project/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/_Project/Scenes/Bootstrapper.unity
+    guid: 59ab5d2a2705a8645b1379632438bf07
+  - enabled: 1
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: deccd480076a64d4896b2950f53f0a54
   - enabled: 1
     path: Assets/_Project/Scenes/GymScene.unity
     guid: b23e7a5b07be741d0a8d5cf22e589c32
+  - enabled: 0
+    path: Assets/_Project/Scenes/SampleScene.unity
+    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: f76cf8fee92b445fd83dc798b9313680, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
