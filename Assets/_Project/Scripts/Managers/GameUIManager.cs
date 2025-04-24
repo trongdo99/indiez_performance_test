@@ -8,6 +8,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
 {
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private GameObject _gameplayHUD;
+    [SerializeField] private GameObject _pausedPanel;
     [SerializeField] private GameObject _virtualButtons;
     
     [SerializeField] private GameObject _countDownPanel;
@@ -148,5 +149,19 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         {
             Debug.LogError(e.Message);
         }
+    }
+
+    public void UI_PauseButtonClicked()
+    {
+        _gameplayHUD.SetActive(false);
+        _pausedPanel.SetActive(true);
+        _gameplayManager.PauseGame();
+    }
+
+    public void UI_ResumeButtonClicked()
+    {
+        _pausedPanel.SetActive(false);
+        _gameplayHUD.SetActive(true);
+        _gameplayManager.ResumeGame();
     }
 }

@@ -58,6 +58,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void Update()
     {
+        if (GameplayManager.Instance.IsGamePaused) return;
+        
         if (_health.IsDead)
         {
             SetState(PlayerState.Dead);

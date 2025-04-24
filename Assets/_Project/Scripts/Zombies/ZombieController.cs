@@ -60,6 +60,8 @@ public class ZombieController : MonoBehaviour
 
     private void Update()
     {
+        if (GameplayManager.Instance.IsGamePaused) return;
+        
         if (_debugDummy) return;
         
         if (_health.IsDead)

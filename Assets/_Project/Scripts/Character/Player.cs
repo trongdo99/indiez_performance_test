@@ -14,6 +14,7 @@ public class Player : MonoBehaviour, ISyncInitializable
     [SerializeField] private CinemachineCamera _topDownCamera;
     
     private PlayerCharacterController _playerCharacterController;
+    
     public Transform PlayerCharacterTransform => _playerCharacterController.transform;
 
     public void Initialize(IProgress<float> progress = null)
@@ -26,6 +27,8 @@ public class Player : MonoBehaviour, ISyncInitializable
 
     private void Update()
     {
+        if (GameplayManager.Instance.IsGamePaused) return;
+        
         if (_playerCharacterController != null)
         {
             _playerCharacterController.SetMoveInput(_input.MoveInput);

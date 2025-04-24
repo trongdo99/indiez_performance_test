@@ -18,6 +18,8 @@ public class TargetFinder : MonoBehaviour
 
     private void Update()
     {
+        if (GameplayManager.Instance.IsGamePaused) return;
+        
         Vector2 lookInput = _input.LookInput;
         Vector3 aimDirection = new Vector3(lookInput.x, 0, lookInput.y).normalized;
 

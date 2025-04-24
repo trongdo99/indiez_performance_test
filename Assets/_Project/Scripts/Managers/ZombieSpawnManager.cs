@@ -38,6 +38,9 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private List<ZombieController> _activeWaveZombies = new List<ZombieController>();
     private int _totalZombiesKilled;
     private int _totalZombiesSpawned;
+    private float _pauseStartTime;
+    private float _totalPausedTime;
+    private bool _isPaused;
 
     public void SetGameplayManager(GameplayManager gameplayManager)
     {
@@ -65,13 +68,15 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
     private void Update()
     {
+        if (_isPaused) return;
+        
         if (_waveInProgress)
         {
             HandleWaveProgress();
         }
         else if (_autoProgressWaves && _currentWaveIndex >= 0 && _currentWaveIndex < _waves.Count)
         {
-            float timeSinceWaveEnd = Time.time - _waveEndTime;
+            float timeSinceWaveEnd = _gameplayManager.GetGameTime() - _waveEndTime;
             if (timeSinceWaveEnd >= _timeBetweenWaves)
             {
                 StartNextWave();
@@ -84,12 +89,14 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         if (_currentWaveIndex < 0 || _currentWaveIndex >= _waves.Count) return;
         
         Wave currentWave = _waves[_currentWaveIndex];
+        
+        float gameTime = _gameplayManager.GetGameTime();
 
-        if (Time.time >= _nextSpawnTime && _totalZombiesSpawned < currentWave.ZombiesToSpawn)
+        if (gameTime >= _nextSpawnTime && _totalZombiesSpawned < currentWave.ZombiesToSpawn)
         {
             SpawnZombie(currentWave);
             _totalZombiesSpawned++;
-            _nextSpawnTime = Time.time + (1f / currentWave.SpawnRate);
+            _nextSpawnTime = gameTime + (1f / currentWave.SpawnRate);
         }
 
         _activeWaveZombies.RemoveAll(zombie => zombie == null);
@@ -125,7 +132,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         if (_currentWaveIndex < 0 || _currentWaveIndex >= _waves.Count) return;
 
         _waveInProgress = false;
-        _waveEndTime = Time.time;
+        _waveEndTime = _gameplayManager.GetGameTime();
 
         Debug.Log($"Wave {_waves[_currentWaveIndex].WaveName} completed");
 
@@ -179,9 +186,21 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
     private void HandleGameStateChanged(GameplayManager.GameState newState, GameplayManager.GameState previousState)
     {
-        if (newState == GameplayManager.GameState.Playing && previousState == GameplayManager.GameState.Starting)
+        switch (newState)
         {
-            StartNextWave();
+            case GameplayManager.GameState.Playing:
+                if (previousState == GameplayManager.GameState.Starting)
+                {
+                    StartNextWave();
+                }
+                else if (previousState == GameplayManager.GameState.Paused)
+                {
+                    _isPaused = false;
+                }
+                break;
+            case GameplayManager.GameState.Paused:
+                _isPaused = true;
+                break;
         }
     }
 }
