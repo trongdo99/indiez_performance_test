@@ -9,6 +9,8 @@ public class GameInitializer : MonoBehaviour
     public static event Action OnInitializationComplete;
     
     [Header("Manager prefabs")]
+    [SerializeField] private GameObject _gameplayManagerPrefab;
+    [SerializeField] private GameObject _gameUIManagerPrefab;
     [SerializeField] private GameObject _playerManagerPrefab;
     [SerializeField] private GameObject _zombieManagerPrefab;
     [SerializeField] private GameObject _zombieSpawnManagerPrefab;
@@ -17,9 +19,7 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private CinemachineCamera _topDownCamera;
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private BoxCollider _levelBoundary;
-    [SerializeField] private Canvas _gameUI;
 
-    private Dictionary<Type, MonoBehaviour> _managers = new Dictionary<Type, MonoBehaviour>();
     private GameInitializer _gameInitializer;
     private readonly Dictionary<string, float> _managerWeights = new Dictionary<string, float>();
     private readonly Dictionary<string, float> _managerContributions = new Dictionary<string, float>();
@@ -27,6 +27,8 @@ public class GameInitializer : MonoBehaviour
     private bool _isInitialized;
     private float _currentProgress;
     
+    private GameplayManager _gameplayManager;
+    private GameUIManager _gameUIManager;
     private Player _player;
     private ZombieManager _zombieManager;
     private ZombieSpawnManager _zombieSpawnManager;
@@ -38,9 +40,11 @@ public class GameInitializer : MonoBehaviour
 
     private void SetupManagerWeight()
     {
-        _managerWeights.Add("PlayerManager", 0.33f);
-        _managerWeights.Add("ZombieManager", 0.33f);
-        _managerWeights.Add("ZombieSpawnManager", 0.33f);
+        _managerWeights.Add("GameplayManager", 0.2f);
+        _managerWeights.Add("GameUIManager", 0.2f);
+        _managerWeights.Add("PlayerManager", 0.2f);
+        _managerWeights.Add("ZombieManager", 0.2f);
+        _managerWeights.Add("ZombieSpawnManager", 0.2f);
     }
 
     public async Task InitializeGame(IProgress<float> initProgress = null)
@@ -65,6 +69,8 @@ public class GameInitializer : MonoBehaviour
         
         SetupDependencies();
 
+        SetupEventsSubscriber();
+
         _isInitialized = false;
         Debug.Log("Game initialization completed");
         
@@ -77,7 +83,6 @@ public class GameInitializer : MonoBehaviour
         _mainCamera = Instantiate(_mainCamera);
         _topDownCamera = Instantiate(_topDownCamera);
         _levelBoundary = Instantiate(_levelBoundary);
-        _gameUI = Instantiate(_gameUI);
     }
 
     private async Task InitializeManagers(Transform parent)
@@ -85,20 +90,43 @@ public class GameInitializer : MonoBehaviour
         // Initialize manaagers in the following order:
         try
         {
-            // 1. ZombieManager
+            // 1. GameplayManager
+            _gameplayManager = await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
+            
+            // 2. GameUIManager
+            _gameUIManager = await InitializeManager<GameUIManager>(_gameUIManagerPrefab, "GameUIManager", parent);
+            
+            // 3. ZombieManager
             _zombieManager = await InitializeManager<ZombieManager>(_zombieManagerPrefab, "ZombieManager", parent);
 
-            // 2. ZombieSpawnManager
+            // 4. ZombieSpawnManager
             _zombieSpawnManager =
                 await InitializeManager<ZombieSpawnManager>(_zombieSpawnManagerPrefab, "ZombieSpawnManager", parent);
 
-            // 3. PlayerManager
+            // 5. PlayerManager
             _player = await InitializeManager<Player>(_playerManagerPrefab, "PlayerManager", parent);
         }
         catch (Exception e)
         {
             Debug.LogError($"Error during manager initialization: {e.Message}");
         }
+    }
+
+    private void SetupDependencies()
+    {
+        Debug.Log("Setting up dependencies ...");
+        _gameUIManager.SetGameplayManager(_gameplayManager);
+        _topDownCamera.GetComponent<CinemachineConfiner3D>().BoundingVolume = _levelBoundary;
+        _player.SetupPlayerFollowCamera(_topDownCamera);
+        _zombieManager.SetPlayerCharacterTransform(_player.PlayerCharacterTransform);
+        _zombieSpawnManager.SetGameplayManager(_gameplayManager);
+    }
+
+    private void SetupEventsSubscriber()
+    {
+        Debug.Log("Setting up events subscriber ...");
+        _gameUIManager.SubscribeToEvents();
+        _zombieSpawnManager.SubscribeToEvents();
     }
 
     private async Task<T> InitializeManager<T>(GameObject prefab, string managerName, Transform parent) where T : MonoBehaviour
@@ -126,10 +154,6 @@ public class GameInitializer : MonoBehaviour
         {
             throw new InvalidOperationException($"Component of type {typeof(T).Name} not found on {managerName} prefab");
         }
-        else
-        {
-            _managers[typeof(T)] = manager;
-        }
         
         if (managerObj.TryGetComponent(out IAsyncInitializable initializable))
         {
@@ -139,6 +163,7 @@ public class GameInitializer : MonoBehaviour
         else if (managerObj.TryGetComponent(out ISyncInitializable syncInitializable))
         {
             var progressTracker= new ManagerProgressTracker(this, managerName);
+            progressTracker.Report(0f);
             syncInitializable.Initialize(progressTracker);
             progressTracker.Report(1f);
         }
@@ -156,25 +181,7 @@ public class GameInitializer : MonoBehaviour
         Debug.Log($"{managerName} initialized successfully");
         return manager;
     }
-
-    private void SetupDependencies()
-    {
-        _topDownCamera.GetComponent<CinemachineConfiner3D>().BoundingVolume = _levelBoundary;
-        _player.SetupPlayerFollowCamera(_topDownCamera);
-        _zombieManager.SetPlayerCharacterTransform(_player.PlayerCharacterTransform);
-    }
     
-    public T GetManager<T>() where T : MonoBehaviour
-    {
-        if (_managers.TryGetValue(typeof(T), out MonoBehaviour manager))
-        {
-            return manager as T;;
-        }
-        
-        Debug.LogWarning($"Manager of type {typeof(T).Name} not found");
-        return null;
-    }
-
     private void UpdateProgress(float managerProgress, string managerName = null)
     {
         if (managerName != null && _managerWeights.TryGetValue(managerName, out float weight))

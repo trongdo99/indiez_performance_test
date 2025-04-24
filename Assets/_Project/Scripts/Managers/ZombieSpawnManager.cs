@@ -28,9 +28,9 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private List<SpawnPoint> _spawnPoints = new List<SpawnPoint>();
     [SerializeField] private List<Wave> _waves = new List<Wave>();
     [SerializeField] private float _timeBetweenWaves = 5f;
-    [SerializeField] private float _timeBeforeFirstWave = 3f;
     [SerializeField] private bool _autoProgressWaves = true;
     
+    private GameplayManager _gameplayManager;
     private int _currentWaveIndex = -1;
     private float _nextSpawnTime;
     private float _waveEndTime;
@@ -39,25 +39,28 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private int _totalZombiesKilled;
     private int _totalZombiesSpawned;
 
+    public void SetGameplayManager(GameplayManager gameplayManager)
+    {
+        _gameplayManager = gameplayManager;
+    }
+
     public void Initialize(IProgress<float> progress = null)
     {
-        progress?.Report(0f);
-
         foreach (Wave wave in _waves)
         {
             wave.ZombiesRemaining = wave.ZombiesToSpawn;
             wave.ZombiesKilled = 0;
         }
-
-        GameInitializer.OnInitializationComplete += HandleInitializationComplete;
     }
 
-    private void HandleInitializationComplete()
+    private void OnDestroy()
     {
-        if (_autoProgressWaves)
-        {
-            Invoke("StartNextWave", _timeBeforeFirstWave);
-        }
+        _gameplayManager.OnGameStateChanged -= HandleGameStateChanged;
+    }
+
+    public void SubscribeToEvents()
+    {
+        _gameplayManager.OnGameStateChanged += HandleGameStateChanged;
     }
 
     private void Update()
@@ -172,5 +175,13 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         
         int randomValue = Random.Range(0, _spawnPoints.Count);
         return _spawnPoints[randomValue];
+    }
+
+    private void HandleGameStateChanged(GameplayManager.GameState newState, GameplayManager.GameState previousState)
+    {
+        if (newState == GameplayManager.GameState.Playing && previousState == GameplayManager.GameState.Starting)
+        {
+            StartNextWave();
+        }
     }
 }
