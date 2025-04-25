@@ -51,15 +51,15 @@ public class Grenade : MonoBehaviour
             float damageMultiplier = 1 - (distance / _explosionDamage);
             float damage = _explosionDamage * damageMultiplier;
             
-            if (hitCollider.TryGetComponent(out Health health))
-            {
-                health.TryChangeHealth(-damage);
-            }
-
             if (hitCollider.TryGetComponent(out Rigidbody rigidbody) && hitCollider.TryGetComponent(out ZombieController zombieController))
             {
                 zombieController.EnableRagDoll(2f);
                 rigidbody.AddExplosionForce(_explosionForce, transform.position, _explosionRadius, 1f, ForceMode.Impulse);
+            }
+            
+            if (hitCollider.TryGetComponent(out Health health))
+            {
+                health.TryChangeHealth(-damage);
             }
             
             Destroy(gameObject, 2f);

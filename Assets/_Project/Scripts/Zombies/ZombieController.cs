@@ -11,18 +11,20 @@ public class ZombieController : MonoBehaviour
         Idle,
         Chasing,
         Attacking,
+        Ragdoll,
         Dead,
     }
     
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
     [SerializeField] private Collider _targetCollider;
-    [SerializeField] private Collider _ragDollCollider;
+    [SerializeField] private LayerMask _groundLayerMask;
     
     [SerializeField] private float _attackRange = 1.5f;
     [SerializeField] private float _rotationSpeedWhileAttacking = 5f;
     [SerializeField] private float _attackCoolDown = 2f;
     [SerializeField] private float _damageToHealth = -20f;
+    [SerializeField] private float _ragdollRecoveryTime = 3f;
     
     [SerializeField] private bool _debugDummy;
 
@@ -36,7 +38,7 @@ public class ZombieController : MonoBehaviour
     private float _lastAttackTime;
     private Transform _target;
     private Health _targetHealth;
-    private bool _isRagDoll;
+    private bool _hasHitGround;
 
     private void Start()
     {
@@ -47,7 +49,6 @@ public class ZombieController : MonoBehaviour
         _dissolveEffect = GetComponent<ZombieDissolveEffect>();
         _rigidbody = GetComponent<Rigidbody>();
         _rigidbody.isKinematic = true;
-        _ragDollCollider.enabled = false;
         
         _hitBox.OnPlayerHit += DoDamage;
         _animationEventProxy.OnAttackAnimationCompleted += HandleAttackingAnimationCompleted;
@@ -69,14 +70,7 @@ public class ZombieController : MonoBehaviour
     {
         if (GameplayManager.Instance.IsGamePaused) return;
         
-        if (_isRagDoll) return;
-        
         if (_debugDummy) return;
-        
-        if (_health.IsDead)
-        {
-            SetState(ZombieState.Dead);
-        }
 
         switch (_currentState)
         {
@@ -88,6 +82,9 @@ public class ZombieController : MonoBehaviour
                 break;
             case ZombieState.Attacking:
                 RotateTowardsTarget();
+                break;
+            case ZombieState.Ragdoll:
+                // Ragdoll is handled by physics system
                 break;
         }
     }
@@ -108,30 +105,66 @@ public class ZombieController : MonoBehaviour
 
     private void SetState(ZombieState newState, bool force = false)
     {
-        if (!force && _currentState == newState ) return;
+        if (!force && _currentState == newState) return;
+        
         Debug.Log($"Zombie state changed from {_currentState} to {newState}");
+        
         _currentState = newState;
 
         switch (_currentState)
         {
             case ZombieState.Idle:
-                _agent.isStopped = true;
+                if (_agent.enabled)
+                {
+                    _agent.isStopped = true;
+                }
                 _animator.SetFloat(AnimatorParameters.ZombieVelocity, 0f);
                 break;
+                
             case ZombieState.Chasing:
+                if (!_agent.enabled)
+                {
+                    _agent.enabled = true;
+                }
                 _agent.isStopped = false;
                 break;
+                
             case ZombieState.Attacking:
-                _agent.isStopped = true;
+                if (_agent.enabled)
+                {
+                    _agent.isStopped = true;
+                }
                 _animator.SetTrigger(AnimatorParameters.ZombieAttack);
                 _lastAttackTime = Time.time;
                 break;
+                
+            case ZombieState.Ragdoll:
+                _agent.enabled = false;
+                _animator.enabled = false;
+                _collider.enabled = true;
+                _rigidbody.isKinematic = false;
+                _hasHitGround = false;
+                
+                StartCoroutine(MonitorGroundContact(_ragdollRecoveryTime));
+                break;
+                
             case ZombieState.Dead:
-                _collider.enabled = false;
-                _ragDollCollider.enabled = true;
-                _targetCollider.enabled = false;
-                _agent.isStopped = true;
-                _animator.SetTrigger(AnimatorParameters.ZombieDie);
+                if (_currentState != ZombieState.Ragdoll)
+                {
+                    _animator.enabled = true;
+                    _animator.SetTrigger(AnimatorParameters.ZombieDie);
+                    
+                    _rigidbody.isKinematic = true;
+                    if (_agent.enabled)
+                    {
+                        _agent.isStopped = true;
+                        _agent.enabled = false;
+                    }
+                    
+                    _targetCollider.enabled = false;
+                }
+                
+                // If coming from ragdoll, ground contact will handle the rest
                 break;
         }
     }
@@ -159,9 +192,12 @@ public class ZombieController : MonoBehaviour
             return;
         }
         
-        _agent.SetDestination(_target.position);
-        float normalizedMoveSpeed = Mathf.Clamp01(_agent.velocity.magnitude / _agent.speed);
-        _animator.SetFloat(AnimatorParameters.ZombieVelocity, normalizedMoveSpeed);
+        if (_agent.enabled)
+        {
+            _agent.SetDestination(_target.position);
+            float normalizedMoveSpeed = Mathf.Clamp01(_agent.velocity.magnitude / _agent.speed);
+            _animator.SetFloat(AnimatorParameters.ZombieVelocity, normalizedMoveSpeed);
+        }
     }
 
     private void RotateTowardsTarget()
@@ -171,6 +207,7 @@ public class ZombieController : MonoBehaviour
             SetState(ZombieState.Idle);
             return;
         }
+        
         Vector3 direction = (_target.position - transform.position).normalized;
         direction.y = 0f;
 
@@ -185,30 +222,63 @@ public class ZombieController : MonoBehaviour
         return _target == null || (_targetHealth != null && _targetHealth.IsDead);
     }
 
-    public void EnableRagDoll(float duration = 1)
+    public void EnableRagDoll(float duration = 3f)
     {
-        if (_isRagDoll) return;
-        _isRagDoll = true;
-        
-        _agent.enabled = false;
-        _rigidbody.isKinematic = false;
-        _animator.enabled = false;
-
-        StartCoroutine(ReturnFromRagdoll(duration));
+        _ragdollRecoveryTime = duration;
+        SetState(ZombieState.Ragdoll);
     }
 
-    private IEnumerator ReturnFromRagdoll(float duration)
+    private IEnumerator MonitorGroundContact(float maxDuration)
     {
-        yield return new WaitForSeconds(duration);
+        float startTime = Time.time;
 
-        _rigidbody.isKinematic = true;
-        _agent.enabled = true;
-        _animator.enabled = true;
-        _isRagDoll = false;
+        while (Time.time - startTime < maxDuration && !_hasHitGround)
+        {
+            yield return null;
+        }
 
         if (_health.IsDead)
         {
-            SetState(ZombieState.Dead);
+            PlayDeathAnimation();
+        }
+        else
+        {
+            RecoverFromRagdoll();
+        }
+    }
+
+    private void PlayDeathAnimation()
+    {
+        _rigidbody.isKinematic = true;
+        _targetCollider.enabled = false;
+        
+        _animator.enabled = true;
+        _animator.SetTrigger(AnimatorParameters.ZombieDie);
+        
+        _currentState = ZombieState.Dead;
+    }
+
+    private void RecoverFromRagdoll()
+    {
+        if (_currentState != ZombieState.Ragdoll || _health.IsDead) return;
+        
+        _rigidbody.isKinematic = true;
+        _animator.enabled = true;
+        
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas))
+        {
+            _agent.enabled = true;
+            _agent.Warp(hit.position);
+            
+            if (_target != null && !IsTargetDead())
+            {
+                SetState(ZombieState.Chasing);
+            }
+            else
+            {
+                SetState(ZombieState.Idle);
+            }
         }
         else
         {
@@ -245,7 +315,11 @@ public class ZombieController : MonoBehaviour
 
     private void HandleOnHealthReachedZero()
     {
-        SetState(ZombieState.Dead);
+        // If in ragdoll, let the ground contact handle death animation
+        if (_currentState != ZombieState.Ragdoll)
+        {
+            SetState(ZombieState.Dead);
+        }
     }
 
     private void HandleOnDissolveCompleted()
@@ -256,5 +330,16 @@ public class ZombieController : MonoBehaviour
     private void DoDamage(Health health)
     {
         health.TryChangeHealth(_damageToHealth);
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (_currentState != ZombieState.Ragdoll) return;
+
+        // Check if collided with ground layer
+        if (((1 << other.gameObject.layer) & _groundLayerMask) != 0)
+        {
+            _hasHitGround = true;
+        }
     }
 }
