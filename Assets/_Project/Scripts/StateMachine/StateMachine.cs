@@ -1,5 +1,3 @@
-// Base State Interface
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,7 +25,6 @@ public abstract class StateMachine<TStateType> : MonoBehaviour where TStateType 
     {
         if (_currentState != null)
         {
-            Debug.Log($"{gameObject.name} state changing from {_currentStateType} to {newStateType}");
             _currentState.Exit();
         }
 

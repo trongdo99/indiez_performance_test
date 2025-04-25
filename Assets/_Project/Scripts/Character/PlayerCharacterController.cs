@@ -1,19 +1,18 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+
+public enum PlayerStateType
+{
+    Idle,
+    Moving,
+    Dead
+}
 
 [RequireComponent(typeof(CharacterController), typeof(Health))]
-public class PlayerCharacterController : MonoBehaviour
+public class PlayerCharacterController : StateMachine<PlayerStateType>
 {
     public event Action OnDeath;
     public event Action OnDeathAnimationComplete;
-    
-    public enum PlayerState
-    {
-        Idle,
-        Moving,
-        Dead
-    }
     
     [SerializeField] private float _maxMoveSpeed = 5f;
     [SerializeField] private float _movementSharpness = 15f;
@@ -32,12 +31,24 @@ public class PlayerCharacterController : MonoBehaviour
     private Vector2 _lookInput;
     private Vector3 _cameraRelativeInput;
     public Vector3 CurrentVelocity => _characterController.velocity;
-    private Vector3 _currentVelocity;
-    private Quaternion _currentRotation;
-    
-    private PlayerState _currentState = PlayerState.Idle;
-    
+
     public bool IsAlive => !_health.IsDead;
+
+    // Properties for states to access
+    public CharacterController CharacterController => _characterController;
+    public PlayerBoundaryConstraint BoundaryConstraint => _boundaryConstraint;
+    public Animator Animator => _animator;
+    public Health Health => _health;
+    public Camera MainCamera => _camera;
+    public Vector2 MoveInput => _moveInput;
+    public Vector2 LookInput => _lookInput;
+    public Vector3 CameraRelativeInput => _cameraRelativeInput;
+    public Vector3 CurrentVelocityRef { get; set; }
+    public Quaternion CurrentRotationRef { get; set; }
+    public float MaxMoveSpeed => _maxMoveSpeed;
+    public float MovementSharpness => _movementSharpness;
+    public float RotationSharpness => _rotationSharpness;
+    public float Gravity => _gravity;
 
     private void Awake()
     {
@@ -47,6 +58,11 @@ public class PlayerCharacterController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _throwWeaponController = GetComponent<ThrowWeaponController>();
         _health = GetComponent<Health>();
+
+        // Initialize states
+        _states[PlayerStateType.Idle] = new PlayerIdleState(this);
+        _states[PlayerStateType.Moving] = new PlayerMovingState(this);
+        _states[PlayerStateType.Dead] = new PlayerDeadState(this);
     }
 
     private void Start()
@@ -56,42 +72,26 @@ public class PlayerCharacterController : MonoBehaviour
 
         _health.OnHealthReachedZero += HandlePlayerHealthReachedZero;
         _animationEventProxy.AnimationDieCompletedEvent += HandleAnimationDieCompleted;
+
+        // Start in idle state
+        ChangeState(PlayerStateType.Idle);
     }
 
-    private void Update()
+    protected override void Update()
     {
         if (GameplayManager.Instance.IsGamePaused) return;
         
-        if (_health.IsDead)
+        if (_health.IsDead && CurrentStateType != PlayerStateType.Dead)
         {
-            SetState(PlayerState.Dead);
+            ChangeState(PlayerStateType.Dead);
         }
 
-        switch (_currentState)
-        {
-            case PlayerState.Idle:
-                HandleIdle();
-                break;
-            case PlayerState.Moving:
-                HandleMoving();
-                break;
-            case PlayerState.Dead:
-                // No logic
-                break;
-        }
-    }
-
-    private void LateUpdate()
-    {
-        if (_currentState != PlayerState.Dead)
-        {
-            RotateTowardTargetDirection();
-        }
+        base.Update();
     }
 
     public void SetMoveInput(Vector2 moveInput)
     {
-        if (_currentState == PlayerState.Dead) return;
+        if (CurrentStateType == PlayerStateType.Dead) return;
         
         _moveInput = moveInput;
         
@@ -108,20 +108,19 @@ public class PlayerCharacterController : MonoBehaviour
         
         _cameraRelativeInput = cameraRelativeInput;
         
-        // Update state based on movement input
         if (_cameraRelativeInput.magnitude > 0.01f)
         {
-            SetState(PlayerState.Moving);
+            ChangeState(PlayerStateType.Moving);
         }
         else
         {
-            SetState(PlayerState.Idle);
+            ChangeState(PlayerStateType.Idle);
         }
     }
 
     public void SetLookInput(Vector2 lookInput)
     {
-        if (_currentState == PlayerState.Dead) return;
+        if (CurrentStateType == PlayerStateType.Dead) return;
         
         _lookInput = lookInput;
     }
@@ -130,71 +129,16 @@ public class PlayerCharacterController : MonoBehaviour
     {
         _throwWeaponController.ThrowGrenade();
     }
-    
-    private void SetState(PlayerState newState, bool force = false)
-    {
-        if (!force && _currentState == newState) return;
-        
-        Debug.Log($"Player state changed from {_currentState} to {newState}");
-        _currentState = newState;
 
-        switch (_currentState)
-        {
-            case PlayerState.Idle:
-                _animator.SetFloat(AnimatorParameters.VelocityX, 0f);
-                _animator.SetFloat(AnimatorParameters.VelocityZ, 0f);
-                break;
-                
-            case PlayerState.Moving:
-                // No logic
-                break;
-                
-            case PlayerState.Dead:
-                _animator.SetTrigger(AnimatorParameters.Die);
-                OnDeath?.Invoke();
-                break;
-        }
-    }
-
-    private void HandleIdle()
-    {
-        ApplyGravity();
-        
-        _currentVelocity = Vector3.Lerp(_currentVelocity, Vector3.zero,
-            1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
-        
-        _characterController.Move(_currentVelocity * Time.deltaTime);
-    }
-
-    private void HandleMoving()
-    {
-        Vector3 targetVelocity = _cameraRelativeInput.normalized * _maxMoveSpeed;
-        
-        if (_boundaryConstraint != null)
-        {
-            targetVelocity = _boundaryConstraint.ConstrainVelocityToBounds(targetVelocity);
-        }
-        
-        _currentVelocity = Vector3.Lerp(_currentVelocity, targetVelocity,
-            1f - Mathf.Exp(-_movementSharpness * Time.deltaTime));
-        
-        ApplyGravity();
-        
-        _characterController.Move(_currentVelocity * Time.deltaTime);
-        
-        _animator.SetFloat(AnimatorParameters.VelocityX, _currentVelocity.x);
-        _animator.SetFloat(AnimatorParameters.VelocityZ, _currentVelocity.z);
-    }
-    
-    private void ApplyGravity()
+    public void ApplyGravity()
     {
         if (!_characterController.isGrounded)
         {
-            _currentVelocity -= _characterController.transform.up * (_gravity * Time.deltaTime);
+            CurrentVelocityRef -= _characterController.transform.up * (_gravity * Time.deltaTime);
         }
     }
 
-    private void RotateTowardTargetDirection()
+    public void RotateTowardTargetDirection()
     {
         Vector3 targetDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
         
@@ -202,18 +146,28 @@ public class PlayerCharacterController : MonoBehaviour
         {
             Vector3 smoothedRotateDirection = Vector3.Slerp(transform.forward, targetDirection, 
                 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime)).normalized;
-            _currentRotation = Quaternion.LookRotation(smoothedRotateDirection);
-            transform.rotation = _currentRotation;
+            CurrentRotationRef = Quaternion.LookRotation(smoothedRotateDirection);
+            transform.rotation = CurrentRotationRef;
         }
     }
     
     private void HandlePlayerHealthReachedZero()
     {
-        SetState(PlayerState.Dead);
+        ChangeState(PlayerStateType.Dead);
     }
 
     private void HandleAnimationDieCompleted()
     {
         OnDeathAnimationComplete?.Invoke();
+    }
+
+    public override void ChangeState(PlayerStateType newStateType)
+    {
+        base.ChangeState(newStateType);
+        
+        if (newStateType == PlayerStateType.Dead)
+        {
+            OnDeath?.Invoke();
+        }
     }
 }
