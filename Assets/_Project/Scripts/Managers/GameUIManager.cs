@@ -53,14 +53,14 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         _player.OnPlayerDeathAnimationCompleted -= HandlePlayerDeathAnimationCompleted;
     }
 
-    private void HandleGameStateChanged(GameplayManager.GameState newState, GameplayManager.GameState previousState)
+    private void HandleGameStateChanged(GameplayStateType newState, GameplayStateType previousState)
     {
         switch (newState)
         {
-            case GameplayManager.GameState.Starting:
+            case GameplayStateType.Starting:
                 _countDownPanel.SetActive(true);
                 break;
-            case GameplayManager.GameState.Playing:
+            case GameplayStateType.Playing:
                 _gameplayHUD.SetActive(true);
                 _virtualButtons.SetActive(true);
                 break;

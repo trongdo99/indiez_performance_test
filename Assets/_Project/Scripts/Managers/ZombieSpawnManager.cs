@@ -184,21 +184,21 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         return _spawnPoints[randomValue];
     }
 
-    private void HandleGameStateChanged(GameplayManager.GameState newState, GameplayManager.GameState previousState)
+    private void HandleGameStateChanged(GameplayStateType newState, GameplayStateType previousState)
     {
         switch (newState)
         {
-            case GameplayManager.GameState.Playing:
-                if (previousState == GameplayManager.GameState.Starting)
+            case GameplayStateType.Playing:
+                if (previousState == GameplayStateType.Starting)
                 {
                     StartNextWave();
                 }
-                else if (previousState == GameplayManager.GameState.Paused)
+                else if (previousState == GameplayStateType.Paused)
                 {
                     _isPaused = false;
                 }
                 break;
-            case GameplayManager.GameState.Paused:
+            case GameplayStateType.Paused:
                 _isPaused = true;
                 break;
         }
