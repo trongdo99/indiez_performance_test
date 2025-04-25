@@ -23,6 +23,7 @@ public class PlayerCharacterController : MonoBehaviour
     private CharacterController _characterController;
     private PlayerBoundaryConstraint _boundaryConstraint;
     private PlayerAnimationEventProxy _animationEventProxy;
+    private ThrowWeaponController _throwWeaponController;
     private Animator _animator;
     private Health _health;
     private Camera _camera;
@@ -44,6 +45,7 @@ public class PlayerCharacterController : MonoBehaviour
         _boundaryConstraint = GetComponent<PlayerBoundaryConstraint>();
         _animationEventProxy = GetComponentInChildren<PlayerAnimationEventProxy>();
         _animator = GetComponentInChildren<Animator>();
+        _throwWeaponController = GetComponent<ThrowWeaponController>();
         _health = GetComponent<Health>();
     }
 
@@ -122,6 +124,11 @@ public class PlayerCharacterController : MonoBehaviour
         if (_currentState == PlayerState.Dead) return;
         
         _lookInput = lookInput;
+    }
+
+    public void Throw()
+    {
+        _throwWeaponController.ThrowGrenade();
     }
     
     private void SetState(PlayerState newState, bool force = false)

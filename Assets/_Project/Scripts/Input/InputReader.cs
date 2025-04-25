@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class InputReader : ScriptableObject, PlayerInputSystem_Actions.IPlayerActions
 {
     public event Action<Vector2> MoveEvent;
+    public event Action OnAttackEvent;
     
     public Vector2 MoveInput => _inputActions.Player.Move.ReadValue<Vector2>();
     public Vector2 LookInput => _inputActions.Player.Look.ReadValue<Vector2>();
@@ -34,7 +35,10 @@ public class InputReader : ScriptableObject, PlayerInputSystem_Actions.IPlayerAc
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        // noop
+        if (context.performed)
+        {
+            OnAttackEvent?.Invoke();
+        }
     }
 
     public void OnInteract(InputAction.CallbackContext context)

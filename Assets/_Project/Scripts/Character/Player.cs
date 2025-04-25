@@ -19,10 +19,15 @@ public class Player : MonoBehaviour, ISyncInitializable
 
     public void Initialize(IProgress<float> progress = null)
     {
-        progress?.Report(0f);
-        
         _input.EnablePlayerActions();
+        _input.OnAttackEvent += HandleInputAttack;
+        
         SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
+    }
+
+    private void OnDestroy()
+    {
+        _input.OnAttackEvent -= HandleInputAttack;
     }
 
     private void Update()
@@ -77,6 +82,11 @@ public class Player : MonoBehaviour, ISyncInitializable
     private void RespawnPlayerCharacter()
     {
         SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
+    }
+
+    private void HandleInputAttack()
+    {
+        _playerCharacterController.Throw();
     }
 
     private void HandlePlayerCharacterDeath()

@@ -8,6 +8,7 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private WeaponType _currentWeapon;
     [SerializeField] private GameObject _shotgun;
     [SerializeField] private GameObject _sniperRifle;
+    
     [SerializeField] private Transform _leftHandIkTargetTransform;
     [SerializeField] private Transform _leftHandIkHintTransform;
     [SerializeField] private Transform _targetMarker;

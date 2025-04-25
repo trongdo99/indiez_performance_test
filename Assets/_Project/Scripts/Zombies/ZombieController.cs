@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +17,7 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
     [SerializeField] private Collider _targetCollider;
+    [SerializeField] private Collider _ragDollCollider;
     
     [SerializeField] private float _attackRange = 1.5f;
     [SerializeField] private float _rotationSpeedWhileAttacking = 5f;
@@ -30,9 +32,11 @@ public class ZombieController : MonoBehaviour
     private Animator _animator;
     private NavMeshAgent _agent;
     private Collider _collider;
+    private Rigidbody _rigidbody;
     private float _lastAttackTime;
     private Transform _target;
     private Health _targetHealth;
+    private bool _isRagDoll;
 
     private void Start()
     {
@@ -41,6 +45,9 @@ public class ZombieController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _collider = GetComponent<Collider>();
         _dissolveEffect = GetComponent<ZombieDissolveEffect>();
+        _rigidbody = GetComponent<Rigidbody>();
+        _rigidbody.isKinematic = true;
+        _ragDollCollider.enabled = false;
         
         _hitBox.OnPlayerHit += DoDamage;
         _animationEventProxy.OnAttackAnimationCompleted += HandleAttackingAnimationCompleted;
@@ -61,6 +68,8 @@ public class ZombieController : MonoBehaviour
     private void Update()
     {
         if (GameplayManager.Instance.IsGamePaused) return;
+        
+        if (_isRagDoll) return;
         
         if (_debugDummy) return;
         
@@ -119,6 +128,7 @@ public class ZombieController : MonoBehaviour
                 break;
             case ZombieState.Dead:
                 _collider.enabled = false;
+                _ragDollCollider.enabled = true;
                 _targetCollider.enabled = false;
                 _agent.isStopped = true;
                 _animator.SetTrigger(AnimatorParameters.ZombieDie);
@@ -173,6 +183,37 @@ public class ZombieController : MonoBehaviour
     private bool IsTargetDead()
     {
         return _target == null || (_targetHealth != null && _targetHealth.IsDead);
+    }
+
+    public void EnableRagDoll(float duration = 1)
+    {
+        if (_isRagDoll) return;
+        _isRagDoll = true;
+        
+        _agent.enabled = false;
+        _rigidbody.isKinematic = false;
+        _animator.enabled = false;
+
+        StartCoroutine(ReturnFromRagdoll(duration));
+    }
+
+    private IEnumerator ReturnFromRagdoll(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        _rigidbody.isKinematic = true;
+        _agent.enabled = true;
+        _animator.enabled = true;
+        _isRagDoll = false;
+
+        if (_health.IsDead)
+        {
+            SetState(ZombieState.Dead);
+        }
+        else
+        {
+            SetState(ZombieState.Idle);
+        }
     }
 
     private void HandleAttackingAnimationCompleted()

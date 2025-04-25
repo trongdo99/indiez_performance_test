@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 6054524367723344903}
   - component: {fileID: 8622490096216009121}
   - component: {fileID: 1070711667495179405}
+  - component: {fileID: 760525733238014879}
   - component: {fileID: 8089014164323046394}
   - component: {fileID: 3921208937600604796}
   - component: {fileID: 5406183856837540561}
@@ -69,6 +70,7 @@ Transform:
   m_Children:
   - {fileID: 1033149707775230243}
   - {fileID: 2045341163470924124}
+  - {fileID: 101169546769876880}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &6054524367723344903
@@ -132,6 +134,28 @@ MonoBehaviour:
   _targetMarker: {fileID: 2045341163470924124}
   _aimRig: {fileID: 1352489587253841390}
   _handsRig: {fileID: 7526313118422219190}
+--- !u!114 &760525733238014879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4916213645624812614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63823cb7886d4e242888868139b44c9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _grenade: {fileID: 1067534318223756700, guid: 83bb90addc1fcfa4395208198a28f66c, type: 3}
+  _grenadeSpawnPoint: {fileID: 0}
+  _throwPoint: {fileID: 101169546769876880}
+  _zombieLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  _throwCoolDown: 1
+  _maxThrowRange: 10
+  _maxThrowHeight: 5
+  _initialThrowSpeed: 2
 --- !u!114 &8089014164323046394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,6 +288,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8350171084149392987
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 101169546769876880}
+  m_Layer: 0
+  m_Name: ThrowPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &101169546769876880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8350171084149392987}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.57, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4109543573635269528}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3791321915592483218
 PrefabInstance:
   m_ObjectHideFlags: 0
