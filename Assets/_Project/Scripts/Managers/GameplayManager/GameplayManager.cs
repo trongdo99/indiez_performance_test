@@ -21,7 +21,6 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
     
     [SerializeField] private int _timeBeforeStart = 3;
     
-    private ZombieSpawnManager _zombieSpawnManager;
     private float _pauseStartTime;
     private float _totalPausedTime;
     
@@ -59,11 +58,6 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
     public void Initialize(IProgress<float> progress = null)
     {
         ChangeState(GameplayStateType.Loading);
-    }
-    
-    public void SetZombieSpawnManager(ZombieSpawnManager zombieSpawnManager)
-    {
-        _zombieSpawnManager = zombieSpawnManager;
     }
 
     private void OnEnable()

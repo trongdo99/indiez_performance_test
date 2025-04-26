@@ -6,9 +6,7 @@ using Random = UnityEngine.Random;
 
 public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 {
-    public event Action<int> OnWaveCompleted;
-    
-    [System.Serializable]
+    [Serializable]
     public class Wave
     {
         public string WaveName = "Wave 1";
@@ -23,7 +21,6 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private float _timeBetweenWaves = 5f;
     [SerializeField] private bool _autoProgressWaves = true;
     
-    private GameplayManager _gameplayManager;
     private int _currentWaveIndex = -1;
     private float _nextSpawnTime;
     private float _waveEndTime;
@@ -34,11 +31,6 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private float _pauseStartTime;
     private float _totalPausedTime;
     private bool _isPaused;
-
-    public void SetGameplayManager(GameplayManager gameplayManager)
-    {
-        _gameplayManager = gameplayManager;
-    }
 
     public void Initialize(IProgress<float> progress = null)
     {
@@ -93,7 +85,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         }
         else if (_autoProgressWaves && _currentWaveIndex >= 0 && _currentWaveIndex < _waves.Count)
         {
-            float timeSinceWaveEnd = _gameplayManager.GetGameTime() - _waveEndTime;
+            float timeSinceWaveEnd = GameplayManager.Instance.GetGameTime() - _waveEndTime;
             if (timeSinceWaveEnd >= _timeBetweenWaves)
             {
                 StartNextWave();
@@ -107,7 +99,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         
         Wave currentWave = _waves[_currentWaveIndex];
         
-        float gameTime = _gameplayManager.GetGameTime();
+        float gameTime = GameplayManager.Instance.GetGameTime();
 
         if (gameTime >= _nextSpawnTime && _totalZombiesSpawned < currentWave.ZombiesToSpawn)
         {
@@ -149,7 +141,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         if (_currentWaveIndex < 0 || _currentWaveIndex >= _waves.Count) return;
 
         _waveInProgress = false;
-        _waveEndTime = _gameplayManager.GetGameTime();
+        _waveEndTime = GameplayManager.Instance.GetGameTime();
 
         Debug.Log($"Wave {_waves[_currentWaveIndex].WaveName} completed");
 
