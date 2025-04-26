@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 public class ObjectPoolManager : MonoBehaviour, ISyncInitializable
 {
     public static ObjectPoolManager Instance { get; private set; }
+    
+    [SerializeField] private Transform _poolsParent;
+    
+    private Dictionary<Type, Dictionary<int, object>> _poolsByPrefabId = new Dictionary<Type, Dictionary<int, object>>();
+    private Dictionary<Type, Transform> _poolParents = new Dictionary<Type, Transform>();
 
     private void Awake()
     {
@@ -14,139 +18,150 @@ public class ObjectPoolManager : MonoBehaviour, ISyncInitializable
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
-    private Dictionary<string, ObjectPool> _pools = new Dictionary<string, ObjectPool>();
-
     public void Initialize(IProgress<float> progress = null)
     {
-        // noop
+        if (_poolsParent == null)
+        {
+            _poolsParent = transform;
+        }
+    }
+
+    public ObjectPool<T> CreatePool<T>(T prefab, int initialSize, Transform parent = null, int maxSize = 100, bool shouldExpand = true) where T : Component, IPoolable
+    {
+        if (prefab == null)
+        {
+            Debug.LogError("Cannot create pool with null prefab");
+            return null;
+        }
+        
+        // Create a type-specific parent if not provided
+        Transform poolParent = parent;
+        if (poolParent == null)
+        {
+            Type type = typeof(T);
+            if (!_poolParents.TryGetValue(type, out poolParent))
+            {
+                // Create a new parent for this type
+                GameObject parentObj = new GameObject($"{type.Name}Pool");
+                parentObj.transform.SetParent(_poolsParent);
+                poolParent = parentObj.transform;
+                _poolParents[type] = poolParent;
+            }
+        }
+        
+        // Create a prefab-specific parent
+        GameObject prefabPoolObj = new GameObject($"{prefab.name}Pool");
+        prefabPoolObj.transform.SetParent(poolParent);
+        
+        // Create the pool
+        var pool = new ObjectPool<T>(prefab, initialSize, prefabPoolObj.transform, maxSize, shouldExpand);
+        
+        // Store the pool by prefab ID
+        int prefabId = prefab.GetInstanceID();
+        Type componentType = typeof(T);
+        
+        if (!_poolsByPrefabId.TryGetValue(componentType, out var typePools))
+        {
+            typePools = new Dictionary<int, object>();
+            _poolsByPrefabId[componentType] = typePools;
+        }
+        
+        typePools[prefabId] = pool;
+        
+        return pool;
+    }
+
+    public ObjectPool<T> GetPool<T>(T prefab) where T : Component, IPoolable
+    {
+        if (prefab == null) return null;
+        
+        int prefabId = prefab.GetInstanceID();
+        Type componentType = typeof(T);
+        
+        if (_poolsByPrefabId.TryGetValue(componentType, out var typePools))
+        {
+            if (typePools.TryGetValue(prefabId, out var pool))
+            {
+                return (ObjectPool<T>)pool;
+            }
+        }
+        
+        return null;
     }
     
-    public ObjectPool<T> CreatePool<T>(T prefab, int initialSize, Transform parent = null) where T : Component
+    public T Get<T>(T prefab, Vector3 position = default, Quaternion rotation = default, int initialPoolSize = 5) where T : Component, IPoolable
     {
-        string poolKey = typeof(T).Name + "_" + prefab.name;
+        ObjectPool<T> pool = GetPool(prefab);
         
-        if (_pools.ContainsKey(poolKey))
+        // Create pool if it doesn't exist
+        if (pool == null)
         {
-            Debug.LogWarning($"Pool with key {poolKey} already exists!");
-            return _pools[poolKey] as ObjectPool<T>;
+            pool = CreatePool(prefab, initialPoolSize);
         }
-
-        ObjectPool<T> newPool = new ObjectPool<T>(prefab, initialSize, parent);
-        _pools[poolKey] = newPool;
-        return newPool;
+        
+        if (pool != null)
+        {
+            return pool.Get(position, rotation);
+        }
+        
+        return null;
     }
-
-    public ObjectPool<T> GetPool<T>(T prefab) where T : Component
+    
+    public bool Release<T>(T obj) where T : Component, IPoolable
     {
-        string poolKey = typeof(T).Name + "_" + prefab.name;
+        if (obj == null) return false;
         
-        if (!_pools.ContainsKey(poolKey))
+        Type componentType = typeof(T);
+        
+        // Try to find the pool that owns this object
+        if (_poolsByPrefabId.TryGetValue(componentType, out var typePools))
         {
-            Debug.LogWarning($"Pool with key {poolKey} doesn't exist! Creating new pool.");
-            return CreatePool(prefab, 10);
+            foreach (var poolEntry in typePools)
+            {
+                var pool = (ObjectPool<T>)poolEntry.Value;
+                if (pool.IsPooledObject(obj))
+                {
+                    return pool.Release(obj);
+                }
+            }
         }
-
-        return _pools[poolKey] as ObjectPool<T>;
+        
+        // If no pool was found, destroy the object
+        Destroy(obj.gameObject);
+        return false;
     }
-}
-
-public abstract class ObjectPool
-{
-    // Base class for type safety in the dictionary
-}
-
-public class ObjectPool<T> : ObjectPool where T : Component
-{
-    private T _prefab;
-    private Transform _parent;
-    private List<T> _inactiveObjects;
-    private List<T> _activeObjects;
-
-    public ObjectPool(T prefab, int initialSize, Transform parent = null)
+    
+    public void ReleaseAll<T>() where T : Component, IPoolable
     {
-        _prefab = prefab;
-        _parent = parent;
-        _inactiveObjects = new List<T>(initialSize);
-        _activeObjects = new List<T>(initialSize);
+        Type componentType = typeof(T);
         
-        // Pre-instantiate objects
-        for (int i = 0; i < initialSize; i++)
+        if (_poolsByPrefabId.TryGetValue(componentType, out var typePools))
         {
-            T obj = CreateNewObject();
-            _inactiveObjects.Add(obj);
+            foreach (var poolEntry in typePools)
+            {
+                var pool = (ObjectPool<T>)poolEntry.Value;
+                pool.ReleaseAll();
+            }
         }
     }
-
-    private T CreateNewObject()
+    
+    public void ClearAllPools()
     {
-        T newObj = Object.Instantiate(_prefab, _parent);
-        newObj.gameObject.SetActive(false);
-        return newObj;
+        _poolsByPrefabId.Clear();
+        
+        // Destroy all pool parent objects
+        foreach (var parent in _poolParents.Values)
+        {
+            if (parent != null)
+            {
+                Destroy(parent.gameObject);
+            }
+        }
+        
+        _poolParents.Clear();
     }
-
-    public T Get(Vector3 position, Quaternion rotation)
-    {
-        T obj;
-        
-        if (_inactiveObjects.Count > 0)
-        {
-            // Get object from pool
-            obj = _inactiveObjects[_inactiveObjects.Count - 1];
-            _inactiveObjects.RemoveAt(_inactiveObjects.Count - 1);
-        }
-        else
-        {
-            // Create new object if pool is empty
-            obj = CreateNewObject();
-        }
-        
-        // Position the object
-        obj.transform.position = position;
-        obj.transform.rotation = rotation;
-        obj.gameObject.SetActive(true);
-        
-        // Add to active objects
-        _activeObjects.Add(obj);
-        
-        // Initialize poolable component if it exists
-        if (obj.TryGetComponent(out IPoolable poolable))
-        {
-            poolable.OnGetFromPool();
-        }
-        
-        return obj;
-    }
-
-    public void Release(T obj)
-    {
-        if (!_activeObjects.Contains(obj))
-        {
-            Debug.LogWarning($"Trying to release {obj.name} which isn't in the active pool!");
-            return;
-        }
-        
-        // Call release method if it implements IPoolable
-        if (obj.TryGetComponent(out IPoolable poolable))
-        {
-            poolable.OnReleaseToPool();
-        }
-        
-        // Deactivate and move back to inactive pool
-        obj.gameObject.SetActive(false);
-        _activeObjects.Remove(obj);
-        _inactiveObjects.Add(obj);
-    }
-
-    public int ActiveCount => _activeObjects.Count;
-    public int InactiveCount => _inactiveObjects.Count;
-    public int TotalCount => _activeObjects.Count + _inactiveObjects.Count;
-}
-
-public interface IPoolable
-{
-    void OnGetFromPool();
-    void OnReleaseToPool();
 }

@@ -8,11 +8,10 @@ public class SniperRifle : WeaponBase
         
         _lastShootTime = Time.time;
         
-        _muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        _muzzleFlash.Play();
-            
-        Shoot();
-            
-        _lastShootTime = Time.time;
+        // Play muzzle effect
+        PlayMuzzleEffect();
+        
+        // Fire a single projectile
+        FireProjectile();
     }
 }

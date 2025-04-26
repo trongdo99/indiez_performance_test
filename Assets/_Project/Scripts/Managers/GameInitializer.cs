@@ -15,6 +15,7 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private GameObject _zombieManagerPrefab;
     [SerializeField] private GameObject _zombieSpawnManagerPrefab;
     [SerializeField] private GameObject _objectPoolManagerPrefab;
+    [SerializeField] private GameObject _visualEffectManagerPerfab;
     
     [Header("Scene objects")]
     [SerializeField] private CinemachineCamera _topDownCamera;
@@ -34,6 +35,7 @@ public class GameInitializer : MonoBehaviour
     private ZombieManager _zombieManager;
     private ZombieSpawnManager _zombieSpawnManager;
     private ObjectPoolManager _objectPoolManager;
+    private VisualEffectManager _visualEffectManager;
 
     private void Start()
     {
@@ -95,20 +97,23 @@ public class GameInitializer : MonoBehaviour
             // 0. ObjectPoolManager
             _objectPoolManager = await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
             
-            // 1. GameplayManager
+            // 2. VisualEffectManager
+            _visualEffectManager = await InitializeManager<VisualEffectManager>(_visualEffectManagerPerfab, "VisualEffectManager", parent);
+            
+            // 3. GameplayManager
             _gameplayManager = await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
             
-            // 2. GameUIManager
+            // 4. GameUIManager
             _gameUIManager = await InitializeManager<GameUIManager>(_gameUIManagerPrefab, "GameUIManager", parent);
             
-            // 3. ZombieManager
+            // 5. ZombieManager
             _zombieManager = await InitializeManager<ZombieManager>(_zombieManagerPrefab, "ZombieManager", parent);
 
-            // 4. ZombieSpawnManager
+            // 6. ZombieSpawnManager
             _zombieSpawnManager =
                 await InitializeManager<ZombieSpawnManager>(_zombieSpawnManagerPrefab, "ZombieSpawnManager", parent);
 
-            // 5. PlayerManager
+            // 7. PlayerManager
             _player = await InitializeManager<Player>(_playerManagerPrefab, "PlayerManager", parent);
         }
         catch (Exception e)

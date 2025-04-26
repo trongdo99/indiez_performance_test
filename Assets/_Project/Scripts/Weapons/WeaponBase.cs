@@ -5,21 +5,33 @@ public abstract class WeaponBase : MonoBehaviour
 {
     [SerializeField] protected Transform _bulletSpawnPosition;
     [SerializeField] protected TrailRenderer _bulletTrail;
-    [SerializeField] protected ParticleSystem _muzzleFlash;
     [SerializeField] protected float _damageToHealth = -100f;
     [SerializeField] protected float _shootDelay = 1f;
     [SerializeField] protected float _speed = 100f;
     [SerializeField] protected float _missDistance = 100f;
     [SerializeField] protected Vector2 _spread = Vector2.zero;
     [SerializeField] protected LayerMask _collidableLayerMask;
+    
+    [Header("Visual Effects")]
+    [SerializeField] protected VisualEffectData _muzzleFlashEffect;
+    [SerializeField] protected Transform _muzzleFlashPosition;
+    [SerializeField] protected VisualEffectData _impactEffect;
+    [SerializeField] protected bool _useImpactEffects = true;
 
     protected float _lastShootTime;
 
     public abstract void TryToShoot();
 
-    protected virtual void Shoot()
+    // This method fires a single projectile without playing muzzle effect
+    protected virtual void FireProjectile(Vector2 spreadOverride = default)
     {
-        Vector3 shootDirection = _bulletSpawnPosition.forward + new Vector3(Random.Range(-_spread.x, _spread.x), Random.Range(-_spread.y, _spread.y), 0f);
+        Vector2 finalSpread = spreadOverride == default ? _spread : spreadOverride;
+        Vector3 shootDirection = _bulletSpawnPosition.forward + new Vector3(
+            Random.Range(-finalSpread.x, finalSpread.x), 
+            Random.Range(-finalSpread.y, finalSpread.y), 
+            0f
+        );
+        
         TrailRenderer trail = Instantiate(_bulletTrail, _bulletSpawnPosition.position, Quaternion.identity);
 
         if (Physics.Raycast(_bulletSpawnPosition.position, shootDirection, out RaycastHit hit, Mathf.Infinity, _collidableLayerMask, QueryTriggerInteraction.Ignore))
@@ -30,6 +42,20 @@ public abstract class WeaponBase : MonoBehaviour
         {
             StartCoroutine(SpawnTrail(trail, _bulletSpawnPosition.position + shootDirection * _missDistance, Vector3.zero, hit,
                 false));
+        }
+    }
+    
+    // Play muzzle flash effect
+    protected void PlayMuzzleEffect()
+    {
+        if (VisualEffectManager.Instance != null && _muzzleFlashEffect != null)
+        {
+            VisualEffectManager.Instance.PlayEffect(
+                _muzzleFlashEffect,
+                _muzzleFlashPosition.position,
+                _muzzleFlashPosition.rotation,
+                transform
+            );
         }
     }
 
@@ -53,6 +79,17 @@ public abstract class WeaponBase : MonoBehaviour
         // The gameobject may be died before impact, hence collider will be null
         if (impact && hit.collider != null)
         {
+            // Play impact effect using VisualEffectManager
+            if (_useImpactEffects && VisualEffectManager.Instance != null && _impactEffect != null)
+            {
+                VisualEffectManager.Instance.PlayEffect(
+                    _impactEffect,
+                    hitPoint,
+                    Quaternion.FromToRotation(Vector3.up, hitNormal),
+                    hit.transform
+                );
+            }
+            
             if (hit.transform.TryGetComponent(out Health health))
             {
                 Debug.Log($"Hit: {hit.transform.name}");

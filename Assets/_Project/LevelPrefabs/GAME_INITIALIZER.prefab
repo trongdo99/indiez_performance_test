@@ -51,6 +51,7 @@ MonoBehaviour:
   _zombieManagerPrefab: {fileID: 8921467184638710183, guid: 399d266276408de49852b6ce01f54d53, type: 3}
   _zombieSpawnManagerPrefab: {fileID: 4769462111072567546, guid: 966d38b46b0ae6a439c7dee7c4c77b97, type: 3}
   _objectPoolManagerPrefab: {fileID: 8833658245213513542, guid: debff4c486c7e834cae0c5d38c9dc036, type: 3}
+  _visualEffectManagerPerfab: {fileID: 4022705131275212893, guid: 161f596d4b597a0489e6b95aa4b5ceac, type: 3}
   _topDownCamera: {fileID: 5127464140771305451, guid: f62d29c8d7bbaae4d849ff27da928e28, type: 3}
   _mainCamera: {fileID: 328361976613560139, guid: 931cba11caa1e274f8c91d6933d6ba0c, type: 3}
   _levelBoundary: {fileID: 5693018925306031801, guid: 45eea6ef62b21e141a2a12ac72b96dd1, type: 3}
