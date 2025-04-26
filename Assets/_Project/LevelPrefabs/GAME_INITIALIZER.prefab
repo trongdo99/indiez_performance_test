@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7826332026339339375}
   - component: {fileID: 8017020249343522862}
+  - component: {fileID: 5592712037084007371}
   m_Layer: 0
   m_Name: GAME_INITIALIZER
   m_TagString: Untagged
@@ -53,3 +54,17 @@ MonoBehaviour:
   _topDownCamera: {fileID: 5127464140771305451, guid: f62d29c8d7bbaae4d849ff27da928e28, type: 3}
   _mainCamera: {fileID: 328361976613560139, guid: 931cba11caa1e274f8c91d6933d6ba0c, type: 3}
   _levelBoundary: {fileID: 5693018925306031801, guid: 45eea6ef62b21e141a2a12ac72b96dd1, type: 3}
+--- !u!114 &5592712037084007371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607798771934323119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db4d8dd3e78b604eaaf06f21f89ed64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _updateInterval: 0.5
+  _showAverageFPS: 1
