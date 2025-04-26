@@ -48,5 +48,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d138fd0910436614b92ffb3f4712f24b, type: 2}
   - {fileID: 11400000, guid: 2c5de05829b764d4f9c167f2da25ecf4, type: 2}
   - {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}
+  - {fileID: 11400000, guid: 7c9a93127c540ea4b96bae78af0403d9, type: 2}
   _applyQualitySettings: 1
   _globalEffectScale: 1

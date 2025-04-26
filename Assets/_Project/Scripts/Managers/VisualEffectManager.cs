@@ -15,8 +15,6 @@ public class VisualEffectManager : MonoBehaviour, ISyncInitializable
     private Dictionary<string, ObjectPool<VisualEffect>> _effectPools = new Dictionary<string, ObjectPool<VisualEffect>>();
     private HashSet<VisualEffect> _activeEffects = new HashSet<VisualEffect>();
     private Dictionary<string, int> _concurrentEffectCounts = new Dictionary<string, int>();
-    
-    // Add a tracking dictionary to store effect instance → effect ID mapping
     private Dictionary<VisualEffect, string> _effectToIdMap = new Dictionary<VisualEffect, string>();
     
     private void Awake()

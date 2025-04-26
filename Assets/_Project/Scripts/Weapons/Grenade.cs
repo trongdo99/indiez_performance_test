@@ -10,6 +10,7 @@ public class Grenade : MonoBehaviour
     [SerializeField] private float _explosionDamage = 100f;
     [SerializeField] private float _explosionForce = 500f;
     [SerializeField] private LayerMask _damageLayers;
+    [SerializeField] private VisualEffectData _explosionEffect;
     
     private Rigidbody _rigidbody;
     private bool _hasDetonated;
@@ -42,7 +43,8 @@ public class Grenade : MonoBehaviour
     {
         if (_hasDetonated) return;
         _hasDetonated = true;
-        Debug.Log("Detonate");
+
+        VisualEffectManager.Instance.PlayEffect(_explosionEffect, transform.position, Quaternion.identity);
         
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, _explosionRadius, _damageLayers, QueryTriggerInteraction.Ignore);
         foreach (Collider hitCollider in hitColliders)
@@ -61,9 +63,9 @@ public class Grenade : MonoBehaviour
             {
                 health.TryChangeHealth(-damage);
             }
-            
-            Destroy(gameObject, 2f);
         }
+        
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()

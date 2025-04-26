@@ -48,15 +48,12 @@ public abstract class WeaponBase : MonoBehaviour
     // Play muzzle flash effect
     protected void PlayMuzzleEffect()
     {
-        if (VisualEffectManager.Instance != null && _muzzleFlashEffect != null)
-        {
-            VisualEffectManager.Instance.PlayEffect(
-                _muzzleFlashEffect,
-                _muzzleFlashPosition.position,
-                _muzzleFlashPosition.rotation,
-                transform
-            );
-        }
+        VisualEffectManager.Instance.PlayEffect(
+            _muzzleFlashEffect,
+            _muzzleFlashPosition.position,
+            _muzzleFlashPosition.rotation,
+            transform
+        );
     }
 
     protected IEnumerator SpawnTrail(TrailRenderer trail, Vector3 hitPoint, Vector3 hitNormal, RaycastHit hit, bool impact)
@@ -80,7 +77,7 @@ public abstract class WeaponBase : MonoBehaviour
         if (impact && hit.collider != null)
         {
             // Play impact effect using VisualEffectManager
-            if (_useImpactEffects && VisualEffectManager.Instance != null && _impactEffect != null)
+            if (_useImpactEffects)
             {
                 VisualEffectManager.Instance.PlayEffect(
                     _impactEffect,
