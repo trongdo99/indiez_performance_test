@@ -119,18 +119,15 @@ public class ZombieManager : MonoBehaviour, ISyncInitializable
 
     public void HandleZombieDeathSequenceComplete(ZombieController zombie)
     {
-        StartCoroutine(ReturnZombieToPoolAfterDelay(zombie, 1f));
+        ReturnZombieToPool(zombie);
     }
-    
-    private IEnumerator ReturnZombieToPoolAfterDelay(ZombieController zombie, float delay)
+
+    private void ReturnZombieToPool(ZombieController zombie)
     {
-        yield return new WaitForSeconds(delay);
-        
         // Find the zombie type
         int typeIndex = GetZombieTypeIndex(zombie);
         if (typeIndex >= 0)
         {
-            // Access the cached pool directly
             _zombieTypes[typeIndex].Pool.Release(zombie);
             
             Debug.Log($"Returned {_zombieTypes[typeIndex].TypeName} zombie to pool");

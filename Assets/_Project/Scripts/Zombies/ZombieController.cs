@@ -190,6 +190,8 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
 
     public void OnGetFromPool()
     {
+        gameObject.SetActive(true);
+        
         // Reset health
         _health.ResetHealth();
         
@@ -218,6 +220,8 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
 
     public void OnReleaseToPool()
     {
+        gameObject.SetActive(false);
+        
         // Clear target
         _target = null;
         _targetHealth = null;
