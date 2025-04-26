@@ -44,8 +44,16 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     {
         InitializeWaves();
         InitializeZombieSpawnPoints();
-        
+    }
+
+    private void OnEnable()
+    {
         EventBus.Instance.Subscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Instance.Unsubscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
     }
 
     private void InitializeWaves()
@@ -73,11 +81,6 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         {
             Debug.LogWarning("No ZombieSpawnPoint found in the scene");
         }
-    }
-
-    private void OnDestroy()
-    {
-        EventBus.Instance.Unsubscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
     }
 
     private void Update()

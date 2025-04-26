@@ -17,14 +17,17 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     public void Initialize(IProgress<float> progress = null)
     {
         HideAllUI();
-        
+    }
+
+    private void OnEnable()
+    {
         EventBus.Instance.Subscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
         EventBus.Instance.Subscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);
         EventBus.Instance.Subscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
         EventBus.Instance.Subscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         EventBus.Instance.Unsubscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
         EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);

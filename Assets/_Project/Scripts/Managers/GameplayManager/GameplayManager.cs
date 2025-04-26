@@ -54,9 +54,6 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
         _currentState = _states[_currentStateType];
         // Manually call Enter() to initialize the state
         _currentState.Enter();
-        
-        // Subscribe
-        EventBus.Instance.Subscribe<GameEvents.AllWavesCompleted>(HandleAllWavesCompleted);
     }
 
     public void Initialize(IProgress<float> progress = null)
@@ -69,10 +66,18 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
         _zombieSpawnManager = zombieSpawnManager;
     }
 
-    // Also make sure to unsubscribe in OnDestroy
-    private void OnDestroy()
+    private void OnEnable()
+    {
+        EventBus.Instance.Subscribe<GameEvents.AllWavesCompleted>(HandleAllWavesCompleted);
+    }
+
+    private void OnDisable()
     {
         EventBus.Instance.Unsubscribe<GameEvents.AllWavesCompleted>(HandleAllWavesCompleted);
+    }
+
+    private void OnDestroy()
+    {
         GameInitializer.OnInitializationComplete -= HandleInitializationComplete;
         
         // Reset the game state in case the game was destroyed while paused
