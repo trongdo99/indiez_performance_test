@@ -19,6 +19,7 @@ public class Player : MonoBehaviour, ISyncInitializable
     {
         _input.EnablePlayerActions();
         _input.OnAttackEvent += HandleInputAttack;
+        _input.OnSwitchWeaponEvent += HandleSwitchWeaponInput;
 
         if (_spawnPoint == null)
         {
@@ -31,6 +32,7 @@ public class Player : MonoBehaviour, ISyncInitializable
     private void OnDestroy()
     {
         _input.OnAttackEvent -= HandleInputAttack;
+        _input.OnSwitchWeaponEvent -= HandleSwitchWeaponInput;
     }
 
     private void Update()
@@ -101,6 +103,11 @@ public class Player : MonoBehaviour, ISyncInitializable
     private void HandleInputAttack()
     {
         _playerCharacterController.Throw();
+    }
+
+    private void HandleSwitchWeaponInput()
+    {
+        _playerCharacterController.SwitchWeapon();
     }
 
     private void HandlePlayerCharacterDeath()

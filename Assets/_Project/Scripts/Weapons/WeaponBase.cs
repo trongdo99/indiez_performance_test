@@ -4,14 +4,18 @@ using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
 {
-    [SerializeField] protected Transform _bulletSpawnPosition;
-    [SerializeField] protected TrailRenderer _bulletTrail;
+    [Header("Weapon Settings")]
+    [SerializeField] protected WeaponType _weaponType;
     [SerializeField] protected float _damageToHealth = -100f;
     [SerializeField] protected float _shootDelay = 1f;
     [SerializeField] protected float _speed = 100f;
     [SerializeField] protected float _missDistance = 100f;
     [SerializeField] protected Vector2 _spread = Vector2.zero;
     [SerializeField] protected LayerMask _collidableLayerMask;
+    
+    [Header("Projectile Effects")]
+    [SerializeField] protected TrailRenderer _bulletTrail;
+    [SerializeField] protected Transform _bulletSpawnPosition;
     
     [Header("Visual Effects")]
     [SerializeField] protected VisualEffectData _muzzleFlashEffect;
@@ -24,9 +28,27 @@ public abstract class WeaponBase : MonoBehaviour
     [SerializeField] protected bool _randomizePitch = true;
     [SerializeField] protected Vector2 _pitchRange = new Vector2(0.9f, 1.1f);
 
+    [Header("IK")]
+    [SerializeField] protected Transform _leftHandAttachTransform;
+    [SerializeField] protected Transform _leftHandHintTransform;
+
     protected float _lastShootTime;
 
+    public WeaponType WeaponType => _weaponType;
+    public Transform LeftHandAttachTransform => _leftHandAttachTransform;
+    public Transform LeftHandHinTransform => _leftHandHintTransform;
+
     public abstract void TryToShoot();
+
+    public void Equip()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Unequip()
+    {
+        gameObject.SetActive(false);
+    }
 
     // This method fires a single projectile without playing muzzle effect
     protected virtual void FireProjectile(Vector2 spreadOverride = default)

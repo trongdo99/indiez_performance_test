@@ -166,6 +166,12 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
         _animator.SetTrigger(AnimatorParameters.Throw);
         _throwWeaponController.StartThrowSequence();
     }
+
+    public void SwitchWeapon()
+    {
+        if (!IsAlive) return;
+        _weaponController.CycleThroughWeapons();
+    }
     
     private void HandleTargetFound(Transform target)
     {

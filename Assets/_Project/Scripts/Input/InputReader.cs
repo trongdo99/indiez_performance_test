@@ -7,6 +7,7 @@ public class InputReader : ScriptableObject, PlayerInputSystem_Actions.IPlayerAc
 {
     public event Action<Vector2> MoveEvent;
     public event Action OnAttackEvent;
+    public event Action OnSwitchWeaponEvent;
     
     public Vector2 MoveInput => _inputActions.Player.Move.ReadValue<Vector2>();
     public Vector2 LookInput => _inputActions.Player.Look.ReadValue<Vector2>();
@@ -38,6 +39,14 @@ public class InputReader : ScriptableObject, PlayerInputSystem_Actions.IPlayerAc
         if (context.performed)
         {
             OnAttackEvent?.Invoke();
+        }
+    }
+
+    public void OnSwitchWeapon(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            OnSwitchWeaponEvent?.Invoke();
         }
     }
 

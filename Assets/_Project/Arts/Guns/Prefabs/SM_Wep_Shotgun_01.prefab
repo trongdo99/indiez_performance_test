@@ -105,8 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92f390a5216d95458f935986f96cc3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bulletSpawnPosition: {fileID: 1330581099540903662}
-  _bulletTrail: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
+  _weaponType: 0
   _damageToHealth: -10
   _shootDelay: 1
   _speed: 100
@@ -115,6 +114,8 @@ MonoBehaviour:
   _collidableLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _bulletTrail: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
+  _bulletSpawnPosition: {fileID: 1330581099540903662}
   _muzzleFlashEffect: {fileID: 11400000, guid: d138fd0910436614b92ffb3f4712f24b, type: 2}
   _muzzleFlashPosition: {fileID: 3311840160190003668}
   _impactEffect: {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}
@@ -125,6 +126,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3aa295a370f69e441bc837cbf195cedd, type: 2}
   _randomizePitch: 1
   _pitchRange: {x: 0.9, y: 1.1}
+  _leftHandAttachTransform: {fileID: 8600514253895295886}
+  _leftHandHintTransform: {fileID: 7613162370436562175}
   _pelletsPerShot: 5
   _pelletSpread: {x: 0.1, y: 0.1}
   _useRandomizedSpread: 0
