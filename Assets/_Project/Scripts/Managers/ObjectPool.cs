@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class ObjectPool<T> where T : Component, IPoolable
 {
@@ -19,6 +21,20 @@ public class ObjectPool<T> where T : Component, IPoolable
     public ObjectPool(T prefab, int initialSize, Transform parent = null, int maxSize = 100, bool shouldExpand = true)
     {
         _prefab = prefab;
+        _poolParent = parent;
+        _initialSize = initialSize;
+        _maxSize = maxSize;
+        _shouldExpand = shouldExpand;
+        _inactiveObjects = new Stack<T>(initialSize);
+        _activeObjects = new List<T>(initialSize);
+
+        // Initialize the pool with inactive objects
+        InitializePool();
+    }
+    
+    public ObjectPool(Func<T> creationMethod, int initialSize, Transform parent = null, int maxSize = 100, bool shouldExpand = true)
+    {
+        _prefab = creationMethod.Invoke();
         _poolParent = parent;
         _initialSize = initialSize;
         _maxSize = maxSize;

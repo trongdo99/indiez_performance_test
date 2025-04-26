@@ -8,10 +8,10 @@ public class SniperRifle : WeaponBase
         
         _lastShootTime = Time.time;
         
-        // Play muzzle effect
         PlayMuzzleEffect();
         
-        // Fire a single projectile
+        PlayGunShotSoundEffect();
+        
         FireProjectile();
     }
 }

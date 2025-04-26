@@ -15,7 +15,8 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private GameObject _zombieManagerPrefab;
     [SerializeField] private GameObject _zombieSpawnManagerPrefab;
     [SerializeField] private GameObject _objectPoolManagerPrefab;
-    [SerializeField] private GameObject _visualEffectManagerPerfab;
+    [SerializeField] private GameObject _visualEffectManagerPrefab;
+    [SerializeField] private GameObject _soundEffectManagerPrefab;
     
     [Header("Scene objects")]
     [SerializeField] private CinemachineCamera _topDownCamera;
@@ -36,6 +37,7 @@ public class GameInitializer : MonoBehaviour
     private ZombieSpawnManager _zombieSpawnManager;
     private ObjectPoolManager _objectPoolManager;
     private VisualEffectManager _visualEffectManager;
+    private SoundEffectManager _soundEffectManager;
 
     private void Start()
     {
@@ -98,22 +100,25 @@ public class GameInitializer : MonoBehaviour
             _objectPoolManager = await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
             
             // 2. VisualEffectManager
-            _visualEffectManager = await InitializeManager<VisualEffectManager>(_visualEffectManagerPerfab, "VisualEffectManager", parent);
+            _visualEffectManager = await InitializeManager<VisualEffectManager>(_visualEffectManagerPrefab, "VisualEffectManager", parent);
             
-            // 3. GameplayManager
+            // 3. SoundEffectManager
+            _soundEffectManager = await InitializeManager<SoundEffectManager>(_soundEffectManagerPrefab, "SoundEffectManager", parent);
+            
+            // 4. GameplayManager
             _gameplayManager = await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
             
-            // 4. GameUIManager
+            // 5. GameUIManager
             _gameUIManager = await InitializeManager<GameUIManager>(_gameUIManagerPrefab, "GameUIManager", parent);
             
-            // 5. ZombieManager
+            // 6. ZombieManager
             _zombieManager = await InitializeManager<ZombieManager>(_zombieManagerPrefab, "ZombieManager", parent);
 
-            // 6. ZombieSpawnManager
+            // 7. ZombieSpawnManager
             _zombieSpawnManager =
                 await InitializeManager<ZombieSpawnManager>(_zombieSpawnManagerPrefab, "ZombieSpawnManager", parent);
 
-            // 7. PlayerManager
+            // 8. PlayerManager
             _player = await InitializeManager<Player>(_playerManagerPrefab, "PlayerManager", parent);
         }
         catch (Exception e)

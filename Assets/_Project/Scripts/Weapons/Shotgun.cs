@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Shotgun : WeaponBase
 {
+    [ Header( "Shotgun Settings" )]
     [SerializeField] private int _pelletsPerShot = 5;
     [SerializeField] private Vector2 _pelletSpread = new Vector2(0.1f, 0.1f);  // Override the base spread for shotgun pellets
     [SerializeField] private bool _useRandomizedSpread = true;
@@ -13,8 +14,9 @@ public class Shotgun : WeaponBase
         
         _lastShootTime = Time.time;
         
-        // Play muzzle effect only once
         PlayMuzzleEffect();
+        
+        PlayGunShotSoundEffect();
         
         if (_useRandomizedSpread)
         {

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
@@ -17,6 +18,11 @@ public abstract class WeaponBase : MonoBehaviour
     [SerializeField] protected Transform _muzzleFlashPosition;
     [SerializeField] protected VisualEffectData _impactEffect;
     [SerializeField] protected bool _useImpactEffects = true;
+    
+    [Header("Sound Effect")]
+    [SerializeField] protected List<SoundEffectData> _gunShotSoundEffects;
+    [SerializeField] protected bool _randomizePitch = true;
+    [SerializeField] protected Vector2 _pitchRange = new Vector2(0.9f, 1.1f);
 
     protected float _lastShootTime;
 
@@ -42,6 +48,17 @@ public abstract class WeaponBase : MonoBehaviour
         {
             StartCoroutine(SpawnTrail(trail, _bulletSpawnPosition.position + shootDirection * _missDistance, Vector3.zero, hit,
                 false));
+        }
+    }
+
+    protected void PlayGunShotSoundEffect()
+    {
+        SoundEffect soundEffect = SoundEffectManager.Instance.PlayRandomSound(_gunShotSoundEffects, _muzzleFlashPosition.position, transform);
+        
+        if (soundEffect != null && _randomizePitch)
+        {
+            float randomPitch = Random.Range(_pitchRange.x, _pitchRange.y);
+            soundEffect.SetPitch(randomPitch);
         }
     }
     

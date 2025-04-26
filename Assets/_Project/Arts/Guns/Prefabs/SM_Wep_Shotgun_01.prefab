@@ -119,6 +119,12 @@ MonoBehaviour:
   _muzzleFlashPosition: {fileID: 3311840160190003668}
   _impactEffect: {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}
   _useImpactEffects: 1
+  _gunShotSoundEffects:
+  - {fileID: 11400000, guid: 63838310c06047b4287c96695ba18a6c, type: 2}
+  - {fileID: 11400000, guid: 6f4a19eb73569114c87f138f380aa9a0, type: 2}
+  - {fileID: 11400000, guid: 3aa295a370f69e441bc837cbf195cedd, type: 2}
+  _randomizePitch: 1
+  _pitchRange: {x: 0.9, y: 1.1}
   _pelletsPerShot: 5
   _pelletSpread: {x: 0.1, y: 0.1}
   _useRandomizedSpread: 0
