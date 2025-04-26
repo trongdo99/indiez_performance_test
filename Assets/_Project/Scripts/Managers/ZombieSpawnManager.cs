@@ -10,12 +10,6 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     public event Action<int> OnWaveCompleted;
     
     [System.Serializable]
-    public class SpawnPoint
-    {
-        public Transform Location;
-    }
-
-    [System.Serializable]
     public class Wave
     {
         public string WaveName = "Wave 1";
@@ -25,7 +19,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         [HideInInspector] public int ZombiesKilled;
     }
     
-    [SerializeField] private List<SpawnPoint> _spawnPoints = new List<SpawnPoint>();
+    [SerializeField] private List<Transform> _spawnPoints = new List<Transform>();
     [SerializeField] private List<Wave> _waves = new List<Wave>();
     [SerializeField] private float _timeBetweenWaves = 5f;
     [SerializeField] private bool _autoProgressWaves = true;
@@ -49,10 +43,34 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
     public void Initialize(IProgress<float> progress = null)
     {
+        InitializeWaves();
+        InitializeZombieSpawnPoints();
+    }
+
+    private void InitializeWaves()
+    {
         foreach (Wave wave in _waves)
         {
             wave.ZombiesRemaining = wave.ZombiesToSpawn;
             wave.ZombiesKilled = 0;
+        }
+    }
+
+    private void InitializeZombieSpawnPoints()
+    {
+        if (_spawnPoints.Count != 0) return;
+        
+        var spawnPoints = new List<GameObject>(GameObject.FindGameObjectsWithTag("ZombieSpawnPoint"));
+        if (spawnPoints.Count > 0)
+        {
+            foreach (GameObject spawnPoint in spawnPoints)
+            {
+                _spawnPoints.Add(spawnPoint.transform);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No ZombieSpawnPoint found in the scene");
         }
     }
 
@@ -151,9 +169,15 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     {
         if (ZombieManager.Instance == null) return;
         
-        SpawnPoint selectedSpawnPoint = SelectSpawnPoint();
-        Vector3 spawnPosition = selectedSpawnPoint.Location.position;
-        Quaternion spawnRotation = selectedSpawnPoint.Location.rotation;
+        Transform selectedSpawnPoint = SelectSpawnPoint();
+        if (selectedSpawnPoint == null)
+        {
+            Debug.LogWarning("No zombie spawn points available, skipping zombie spawn. Check the scene for ZombieSpawnPoint tags.");
+            return;
+        }
+        
+        Vector3 spawnPosition = selectedSpawnPoint.transform.position;
+        Quaternion spawnRotation = selectedSpawnPoint.transform.rotation;
 
         ZombieController zombie = ZombieManager.Instance.SpawnZombie(spawnPosition, spawnRotation);
         
@@ -175,13 +199,13 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         _activeWaveZombies.Remove(zombie);
     }
 
-    private SpawnPoint SelectSpawnPoint()
+    private Transform SelectSpawnPoint()
     {
         if (_spawnPoints.Count == 0) return null;
         if (_spawnPoints.Count == 1) return _spawnPoints[0];
         
         int randomValue = Random.Range(0, _spawnPoints.Count);
-        return _spawnPoints[randomValue];
+        return _spawnPoints[randomValue].transform;
     }
 
     private void HandleGameStateChanged(GameplayStateType newState, GameplayStateType previousState)

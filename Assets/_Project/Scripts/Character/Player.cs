@@ -21,6 +21,11 @@ public class Player : MonoBehaviour, ISyncInitializable
     {
         _input.EnablePlayerActions();
         _input.OnAttackEvent += HandleInputAttack;
+
+        if (_spawnPoint == null)
+        {
+            _spawnPoint = GetPlayerSpawnPoint();
+        }
         
         SpawnPlayerCharacter(_spawnPoint.position, _spawnPoint.rotation);
     }
@@ -77,6 +82,17 @@ public class Player : MonoBehaviour, ISyncInitializable
         
         Destroy(_playerCharacterController.gameObject);
         _playerCharacterController = null;
+    }
+
+    private Transform GetPlayerSpawnPoint()
+    {
+        var respawnPointObj = GameObject.FindGameObjectWithTag("Respawn");
+        if (!respawnPointObj)
+        {
+            Debug.LogError("Player respawn point not found, check the scene for Respawn tag.");
+            return null;
+        }
+        return respawnPointObj.transform;
     }
 
     private void RespawnPlayerCharacter()
