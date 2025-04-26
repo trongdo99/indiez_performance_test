@@ -6,7 +6,6 @@ using Random = UnityEngine.Random;
 
 public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 {
-    public event Action OnAllWavesCompleted;
     public event Action<int> OnWaveCompleted;
     
     [System.Serializable]
@@ -45,6 +44,8 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     {
         InitializeWaves();
         InitializeZombieSpawnPoints();
+        
+        EventBus.Instance.Subscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
     }
 
     private void InitializeWaves()
@@ -76,12 +77,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
     private void OnDestroy()
     {
-        _gameplayManager.OnGameStateChanged -= HandleGameStateChanged;
-    }
-
-    public void SubscribeToEvents()
-    {
-        _gameplayManager.OnGameStateChanged += HandleGameStateChanged;
+        EventBus.Instance.Unsubscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
     }
 
     private void Update()
@@ -132,7 +128,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         if (_currentWaveIndex >= _waves.Count)
         {
             _waveInProgress = false;
-            OnAllWavesCompleted?.Invoke();
+            EventBus.Instance.Publish<GameEvents.AllWavesCompleted>();
             return;
         }
         
@@ -154,14 +150,17 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
         Debug.Log($"Wave {_waves[_currentWaveIndex].WaveName} completed");
 
-        OnWaveCompleted?.Invoke(_currentWaveIndex);
+        EventBus.Instance.Publish<GameEvents.WaveCompleted, EventData.WaveCompletedData>(new EventData.WaveCompletedData
+        {
+            WaveNumber = _currentWaveIndex + 1
+        });
 
         // Check if this is the final wave
         if (_currentWaveIndex >= _waves.Count - 1)
         {
             Debug.Log("=== All waves completed ===");
             
-            OnAllWavesCompleted?.Invoke();
+            EventBus.Instance.Publish<GameEvents.AllWavesCompleted>();
         }
     }
 
@@ -208,16 +207,16 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         return _spawnPoints[randomValue].transform;
     }
 
-    private void HandleGameStateChanged(GameplayStateType newState, GameplayStateType previousState)
+    private void HandleGameStateChanged(EventData.GameStateChangedData data)
     {
-        switch (newState)
+        switch (data.NewState)
         {
             case GameplayStateType.Playing:
-                if (previousState == GameplayStateType.Starting)
+                if (data.PreviousState == GameplayStateType.Starting)
                 {
                     StartNextWave();
                 }
-                else if (previousState == GameplayStateType.Paused)
+                else if (data.PreviousState == GameplayStateType.Paused)
                 {
                     _isPaused = false;
                 }

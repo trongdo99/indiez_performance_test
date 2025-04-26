@@ -9,6 +9,7 @@ public class GameInitializer : MonoBehaviour
     public static event Action OnInitializationComplete;
     
     [Header("Manager prefabs")]
+    [SerializeField] private GameObject _eventBusPrefab;
     [SerializeField] private GameObject _gameplayManagerPrefab;
     [SerializeField] private GameObject _gameUIManagerPrefab;
     [SerializeField] private GameObject _playerManagerPrefab;
@@ -38,6 +39,7 @@ public class GameInitializer : MonoBehaviour
     private ObjectPoolManager _objectPoolManager;
     private VisualEffectManager _visualEffectManager;
     private SoundEffectManager _soundEffectManager;
+    private EventBus _eventBus;
 
     private void Start()
     {
@@ -75,8 +77,6 @@ public class GameInitializer : MonoBehaviour
         
         SetupDependencies();
 
-        SetupEventsSubscriber();
-
         _isInitialized = false;
         Debug.Log("Game initialization completed");
         
@@ -96,7 +96,10 @@ public class GameInitializer : MonoBehaviour
         // Initialize manaagers in the following order:
         try
         {
-            // 0. ObjectPoolManager
+            // 0. EventBus
+            _eventBus = await InitializeManager<EventBus>(_eventBusPrefab, "EventBus", parent);
+            
+            // 1. ObjectPoolManager
             _objectPoolManager = await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
             
             // 2. VisualEffectManager
@@ -134,10 +137,6 @@ public class GameInitializer : MonoBehaviour
         // GameplayManager
         _gameplayManager.SetZombieSpawnManager(_zombieSpawnManager);
         
-        // GameUIManager
-        _gameUIManager.SetGameplayManager(_gameplayManager);
-        _gameUIManager.SetPlayer(_player);
-        
         // topDownCamera
         _topDownCamera.GetComponent<CinemachineConfiner3D>().BoundingVolume = _levelBoundary;
         
@@ -149,14 +148,6 @@ public class GameInitializer : MonoBehaviour
         
         // ZombieSpawnManager
         _zombieSpawnManager.SetGameplayManager(_gameplayManager);
-    }
-
-    private void SetupEventsSubscriber()
-    {
-        Debug.Log("Setting up events subscriber ...");
-        _gameplayManager.SubscribeToEvents();
-        _gameUIManager.SubscribeToEvents();
-        _zombieSpawnManager.SubscribeToEvents();
     }
 
     private async Task<T> InitializeManager<T>(GameObject prefab, string managerName, Transform parent) where T : MonoBehaviour

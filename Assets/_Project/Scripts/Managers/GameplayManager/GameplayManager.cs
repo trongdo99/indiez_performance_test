@@ -16,7 +16,6 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
 {
     public static GameplayManager Instance { get; private set; }
 
-    public event Action<GameplayStateType, GameplayStateType> OnGameStateChanged;
     public event Action<int> OnCountDownTick;
     public event Action OnCountDownCompleted;
     
@@ -38,6 +37,7 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
             Destroy(gameObject);
             return;
         }
+        
         Instance = this;
 
         // Initialize state dictionary
@@ -54,6 +54,9 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
         _currentState = _states[_currentStateType];
         // Manually call Enter() to initialize the state
         _currentState.Enter();
+        
+        // Subscribe
+        EventBus.Instance.Subscribe<GameEvents.AllWavesCompleted>(HandleAllWavesCompleted);
     }
 
     public void Initialize(IProgress<float> progress = null)
@@ -66,23 +69,16 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
         _zombieSpawnManager = zombieSpawnManager;
     }
 
-    public void SubscribeToEvents()
-    {
-        _zombieSpawnManager.OnAllWavesCompleted += HandleAllWavesCompleted;
-    }
-
     // Also make sure to unsubscribe in OnDestroy
     private void OnDestroy()
     {
+        EventBus.Instance.Unsubscribe<GameEvents.AllWavesCompleted>(HandleAllWavesCompleted);
         GameInitializer.OnInitializationComplete -= HandleInitializationComplete;
         
-        if (_zombieSpawnManager != null)
-        {
-            _zombieSpawnManager.OnAllWavesCompleted -= HandleAllWavesCompleted;
-        }
-
         // Reset the game state in case the game was destroyed while paused
         Time.timeScale = 1f;
+        
+        Instance = null;
     }
     
     public void TriggerCountDownTick(int seconds)
@@ -104,7 +100,11 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
         base.ChangeState(newStateType);
         
         Debug.Log($"Invoking OnGameStateChanged with new={_currentStateType}, prev={previousState}");
-        OnGameStateChanged?.Invoke(_currentStateType, previousState);
+        EventBus.Instance.Publish<GameEvents.GameStateChanged, EventData.GameStateChangedData>(new EventData.GameStateChangedData
+        {
+            NewState = _currentStateType,
+            PreviousState = previousState,
+        });
     }
 
     public float GetGameTime()

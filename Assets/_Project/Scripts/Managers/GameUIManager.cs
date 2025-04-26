@@ -14,48 +14,27 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private GameObject _countDownPanel;
     [SerializeField] private TMP_Text _countdownText;
     
-    private GameplayManager _gameplayManager;
-    private Player _player;
-    
     public void Initialize(IProgress<float> progress = null)
     {
         HideAllUI();
+        
+        EventBus.Instance.Subscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
+        EventBus.Instance.Subscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);
+        EventBus.Instance.Subscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
+        EventBus.Instance.Subscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
     }
 
     private void OnDestroy()
     {
-        UnsubscribeFromEvents();
+        EventBus.Instance.Unsubscribe<GameEvents.GameStateChanged, EventData.GameStateChangedData>(HandleGameStateChanged);
+        EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);
+        EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
+        EventBus.Instance.Unsubscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
     }
 
-    public void SetGameplayManager(GameplayManager gameplayManager)
+    private void HandleGameStateChanged(EventData.GameStateChangedData data)
     {
-        _gameplayManager = gameplayManager;
-    }
-    
-    public void SetPlayer(Player player)
-    {
-        _player = player;
-    }
-
-    public void SubscribeToEvents()
-    {
-        _gameplayManager.OnGameStateChanged += HandleGameStateChanged;
-        _gameplayManager.OnCountDownTick += HandleOnCountDownTick;
-        _gameplayManager.OnCountDownCompleted += HandleOnCountDownCompleted;
-        _player.OnPlayerDeathAnimationCompleted += HandlePlayerDeathAnimationCompleted;
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        _gameplayManager.OnCountDownTick -= HandleOnCountDownTick;
-        _gameplayManager.OnCountDownCompleted -= HandleOnCountDownCompleted;
-        _gameplayManager.OnGameStateChanged -= HandleGameStateChanged;
-        _player.OnPlayerDeathAnimationCompleted -= HandlePlayerDeathAnimationCompleted;
-    }
-
-    private void HandleGameStateChanged(GameplayStateType newState, GameplayStateType previousState)
-    {
-        switch (newState)
+        switch (data.NewState)
         {
             case GameplayStateType.Starting:
                 _countDownPanel.SetActive(true);
@@ -80,16 +59,16 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         _gameOverPanel.SetActive(false);
     }
     
-    private void HandleOnCountDownTick(int seconds)
+    private void HandleOnCountDownTick(EventData.GameStartingCountDownData data)
     {
         if (!_countDownPanel.activeSelf)
         {
             _countDownPanel.SetActive(true);       
         }
         
-        if (seconds > 0)
+        if (data.Seconds > 0)
         {
-            _countdownText.text = seconds.ToString();
+            _countdownText.text = data.Seconds.ToString();
         }
         else
         {
@@ -155,13 +134,13 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     {
         _gameplayHUD.SetActive(false);
         _pausedPanel.SetActive(true);
-        _gameplayManager.PauseGame();
+        GameplayManager.Instance.PauseGame();
     }
 
     public void UI_ResumeButtonClicked()
     {
         _pausedPanel.SetActive(false);
         _gameplayHUD.SetActive(true);
-        _gameplayManager.ResumeGame();
+        GameplayManager.Instance.ResumeGame();
     }
 }

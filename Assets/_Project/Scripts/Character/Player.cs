@@ -6,8 +6,6 @@ using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour, ISyncInitializable
 {
-    public event Action OnPlayerDeathAnimationCompleted;
-    
     [SerializeField] private InputReader _input;
     [SerializeField] private GameObject _playerCharacterPrefab;
     [SerializeField] private Transform _spawnPoint;
@@ -112,6 +110,6 @@ public class Player : MonoBehaviour, ISyncInitializable
 
     private void HandlePlayerAnimationDeathComplete()
     {
-        OnPlayerDeathAnimationCompleted?.Invoke();
+        EventBus.Instance.Publish<GameEvents.PlayerDeathAnimationCompleted>();
     }
 }

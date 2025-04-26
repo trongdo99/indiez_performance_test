@@ -25,11 +25,14 @@ public class StartingState : GameplayState
     {
         for (int i = _gameplayManager.TimeBeforeStart; i >= 0; i--)
         {
-            _gameplayManager.TriggerCountDownTick(i);
+            EventBus.Instance.Publish<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(new EventData.GameStartingCountDownData
+            {
+                Seconds = i,
+            });
             yield return new WaitForSeconds(1f);
         }
         
-        _gameplayManager.TriggerCountDownCompleted();
+        EventBus.Instance.Publish<GameEvents.GameStartingCountDownCompleted>();
         _gameplayManager.ChangeState(GameplayStateType.Playing);
     }
 }

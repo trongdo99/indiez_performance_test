@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc0859dcfbd13ea4eb056830bc0b4928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _eventBusPrefab: {fileID: 606697124812653916, guid: 1485d70816f744e4cabf024cd4455a16, type: 3}
   _gameplayManagerPrefab: {fileID: 8548180921303487295, guid: 92e9be19d3d94a542815e54d2ccf4bbf, type: 3}
   _gameUIManagerPrefab: {fileID: 8753187293027526401, guid: b6369f32cdd12b64eb5eeba8e31af1d4, type: 3}
   _playerManagerPrefab: {fileID: 4488604419232031563, guid: e552ab0483f27de438f370db37130fd6, type: 3}
