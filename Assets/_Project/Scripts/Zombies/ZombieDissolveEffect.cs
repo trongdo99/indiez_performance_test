@@ -11,9 +11,8 @@ public class ZombieDissolveEffect : MonoBehaviour
     [SerializeField] private bool _turnOffShadow = true;
     
     private MaterialPropertyBlock _propertyBlock;
-    
 
-    private void Start()
+    private void Awake()
     {
         _propertyBlock = new MaterialPropertyBlock();
     }
@@ -26,6 +25,12 @@ public class ZombieDissolveEffect : MonoBehaviour
         }
         
         StartCoroutine(DissolveCoroutine());
+    }
+
+    public void ResetDissolveEffect()
+    {
+        _propertyBlock.SetFloat("_DissolveAmount", 0f);
+        _skinnedMeshRenderer.SetPropertyBlock(_propertyBlock);
     }
 
     private IEnumerator DissolveCoroutine()

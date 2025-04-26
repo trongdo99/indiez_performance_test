@@ -192,6 +192,9 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     {
         gameObject.SetActive(true);
         
+        // Reset dissolve material
+        _dissolveEffect.ResetDissolveEffect();
+        
         // Reset health
         _health.ResetHealth();
         
