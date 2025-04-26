@@ -4,6 +4,8 @@
 
     public override void Enter()
     {
+        _zombieController.TargetCollider.enabled = false;
+        
         if (_zombieController.CurrentStateType != ZombieStateType.Ragdoll)
         {
             _zombieController.Animator.enabled = true;

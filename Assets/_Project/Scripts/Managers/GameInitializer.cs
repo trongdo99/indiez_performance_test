@@ -14,6 +14,7 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private GameObject _playerManagerPrefab;
     [SerializeField] private GameObject _zombieManagerPrefab;
     [SerializeField] private GameObject _zombieSpawnManagerPrefab;
+    [SerializeField] private GameObject _objectPoolManagerPrefab;
     
     [Header("Scene objects")]
     [SerializeField] private CinemachineCamera _topDownCamera;
@@ -32,6 +33,7 @@ public class GameInitializer : MonoBehaviour
     private Player _player;
     private ZombieManager _zombieManager;
     private ZombieSpawnManager _zombieSpawnManager;
+    private ObjectPoolManager _objectPoolManager;
 
     private void Start()
     {
@@ -90,6 +92,9 @@ public class GameInitializer : MonoBehaviour
         // Initialize manaagers in the following order:
         try
         {
+            // 0. ObjectPoolManager
+            _objectPoolManager = await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
+            
             // 1. GameplayManager
             _gameplayManager = await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
             

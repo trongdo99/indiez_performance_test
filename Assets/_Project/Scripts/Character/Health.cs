@@ -17,6 +17,12 @@ public class Health : MonoBehaviour
         _isDead = false;
     }
 
+    public void ResetHealth()
+    {
+        _currentHealth = _maxHealth;
+        _isDead = false;
+    }
+    
     public void TryChangeHealth(float amount)
     {
         if (_isDead) return;

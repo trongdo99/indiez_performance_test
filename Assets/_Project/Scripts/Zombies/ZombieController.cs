@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,7 +13,7 @@ public enum ZombieStateType
 }
 
 [RequireComponent(typeof(NavMeshAgent), typeof(Health))]
-public class ZombieController : StateMachine<ZombieStateType>
+public class ZombieController : StateMachine<ZombieStateType>, IPoolable
 {
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
@@ -27,6 +28,7 @@ public class ZombieController : StateMachine<ZombieStateType>
     
     [SerializeField] private bool _debugDummy;
 
+    private ZombieManager _zombieManager;
     private ZombieDissolveEffect _dissolveEffect;
     private Health _health;
     private Animator _animator;
@@ -74,16 +76,22 @@ public class ZombieController : StateMachine<ZombieStateType>
         _states[ZombieStateType.Dead] = new ZombieDeadState(this);
     }
 
-    private void Start()
+    private void OnEnable()
     {
         _hitBox.OnPlayerHit += DoDamage;
         _animationEventProxy.OnAttackAnimationCompleted += HandleAttackingAnimationCompleted;
         _animationEventProxy.OnDieAnimationCompleted += HandleDieAnimationCompleted;
         _health.OnHealthReachedZero += HandleOnHealthReachedZero;
         _dissolveEffect.OnDissolveCompleted += HandleOnDissolveCompleted;
-
-        // Start in idle state
-        ChangeState(ZombieStateType.Idle);
+    }
+    
+    private void OnDisable()
+    {
+        _hitBox.OnPlayerHit -= DoDamage;
+        _animationEventProxy.OnAttackAnimationCompleted -= HandleAttackingAnimationCompleted;
+        _animationEventProxy.OnDieAnimationCompleted -= HandleDieAnimationCompleted;
+        _health.OnHealthReachedZero -= HandleOnHealthReachedZero;
+        _dissolveEffect.OnDissolveCompleted -= HandleOnDissolveCompleted;
     }
 
     protected override void Update()
@@ -102,13 +110,9 @@ public class ZombieController : StateMachine<ZombieStateType>
         base.Update();
     }
 
-    private void OnDestroy()
+    public void SetManager(ZombieManager zombieManager)
     {
-        _hitBox.OnPlayerHit -= DoDamage;
-        _animationEventProxy.OnAttackAnimationCompleted -= HandleAttackingAnimationCompleted;
-        _animationEventProxy.OnDieAnimationCompleted -= HandleDieAnimationCompleted;
-        _health.OnHealthReachedZero -= HandleOnHealthReachedZero;
-        _dissolveEffect.OnDissolveCompleted -= HandleOnDissolveCompleted;
+        _zombieManager = zombieManager;
     }
 
     public void SetTarget(Transform target)
@@ -134,11 +138,6 @@ public class ZombieController : StateMachine<ZombieStateType>
     {
         _ragdollRecoveryTime = duration;
         ChangeState(ZombieStateType.Ragdoll);
-    }
-
-    public void StartDissolveEffect()
-    {
-        _dissolveEffect.StartDissolveEffect();
     }
 
     private void HandleAttackingAnimationCompleted()
@@ -175,15 +174,55 @@ public class ZombieController : StateMachine<ZombieStateType>
         {
             ChangeState(ZombieStateType.Dead);
         }
+        
+        _zombieManager.HandleZombieDeath(this);
     }
 
     private void HandleOnDissolveCompleted()
     {
-        Destroy(gameObject);
+        _zombieManager.HandleZombieDeathSequenceComplete(this);
     }
 
     private void DoDamage(Health health)
     {
         health.TryChangeHealth(_damageToHealth);
+    }
+
+    public void OnGetFromPool()
+    {
+        // Reset health
+        _health.ResetHealth();
+        
+        // Reset agent
+        _agent.enabled = true;
+        _agent.isStopped = false;
+        _agent.ResetPath();
+        
+        // Reset rigidbody
+        _rigidbody.isKinematic = true;
+        
+        // Reset animator
+        _animator.enabled = true;
+        _animator.Rebind();
+        _animator.Update(0f);
+        
+        // Reset collider
+        _collider.enabled = true;
+        
+        // Reset state machine
+        ChangeState(ZombieStateType.Idle);
+        
+        // Reset attack timer
+        _lastAttackTime = 0f;
+    }
+
+    public void OnReleaseToPool()
+    {
+        // Clear target
+        _target = null;
+        _targetHealth = null;
+    
+        // Stop any coroutines
+        StopAllCoroutines();
     }
 }
