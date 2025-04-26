@@ -6,6 +6,8 @@ using UnityEngine;
 public class ZombieManager : MonoBehaviour, ISyncInitializable
 {
     public static ZombieManager Instance { get; private set; }
+    
+    public event Action<ZombieController> OnZombieDeath;
 
     [Serializable]
     public class ZombieType
@@ -115,6 +117,7 @@ public class ZombieManager : MonoBehaviour, ISyncInitializable
     public void HandleZombieDeath(ZombieController zombie)
     {
         _activeZombies.Remove(zombie);
+        OnZombieDeath?.Invoke(zombie);
     }
 
     public void HandleZombieDeathSequenceComplete(ZombieController zombie)

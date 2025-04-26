@@ -152,7 +152,7 @@ MonoBehaviour:
   _grenade: {fileID: 1067534318223756700, guid: 83bb90addc1fcfa4395208198a28f66c, type: 3}
   _throwPoint: {fileID: 101169546769876880}
   _throwCoolDown: 1
-  _maxThrowHeight: 5
+  _maxThrowHeight: 4
   _initialThrowSpeed: 2
 --- !u!114 &8089014164323046394
 MonoBehaviour:
@@ -170,7 +170,7 @@ MonoBehaviour:
   _detectionRadius: 8
   _targetableLayerMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
 --- !u!114 &3921208937600604796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +218,6 @@ MonoBehaviour:
   _coneSegments: 50
   _coneAlpha: 0.3
   _targetLineColor: {r: 0, g: 1, b: 0, a: 1}
-  _targetLineWidth: 2
   _showTargetMarker: 1
   _targetMarkerSize: 0.5
   _showDetectionRange: 1

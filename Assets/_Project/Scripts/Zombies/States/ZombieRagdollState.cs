@@ -57,7 +57,6 @@ public class ZombieRagdollState : ZombieState
     {
         _zombieController.Collider.enabled = false;
         _zombieController.Rigidbody.isKinematic = true;
-        _zombieController.TargetCollider.enabled = false;
         
         _zombieController.Animator.enabled = true;
         _zombieController.Animator.SetTrigger(AnimatorParameters.ZombieDie);

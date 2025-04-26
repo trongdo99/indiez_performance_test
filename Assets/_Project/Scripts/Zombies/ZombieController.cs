@@ -17,7 +17,7 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
 {
     [SerializeField] private ZombieHitBox _hitBox;
     [SerializeField] private ZombieAnimationEventProxy _animationEventProxy;
-    [SerializeField] private Collider _targetCollider;
+    [SerializeField] private Transform _aimAtPosition;
     [SerializeField] private LayerMask _groundLayerMask;
     
     [SerializeField] private float _attackRange = 1.5f;
@@ -42,7 +42,7 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     // Properties for states to access
     public ZombieHitBox HitBox => _hitBox;
     public ZombieAnimationEventProxy AnimationEventProxy => _animationEventProxy;
-    public Collider TargetCollider => _targetCollider;
+    public Transform AimAtPosition => _aimAtPosition;
     public LayerMask GroundLayerMask => _groundLayerMask;
     public float AttackRange => _attackRange;
     public float RotationSpeedWhileAttacking => _rotationSpeedWhileAttacking;
