@@ -8,31 +8,37 @@ public enum PlayerStateType
     Dead
 }
 
-[RequireComponent(typeof(CharacterController), typeof(Health))]
+[RequireComponent(typeof(CharacterController), typeof(Health), typeof(TargetFinder))]
 public class PlayerCharacterController : StateMachine<PlayerStateType>
 {
     public event Action OnDeath;
     public event Action OnDeathAnimationComplete;
     
+    [Header("Movement Settings")]
     [SerializeField] private float _maxMoveSpeed = 5f;
     [SerializeField] private float _movementSharpness = 15f;
     [SerializeField] private float _rotationSharpness = 15f;
     [SerializeField] private float _gravity = 30f;
     
+    [Header("Input")]
+    [SerializeField] private InputReader _input;
+    
     private CharacterController _characterController;
     private PlayerBoundaryConstraint _boundaryConstraint;
     private PlayerAnimationEventProxy _animationEventProxy;
     private ThrowWeaponController _throwWeaponController;
+    private TargetFinder _targetFinder;
+    private WeaponController _weaponController;
     private Animator _animator;
     private Health _health;
     private Camera _camera;
-
     private Vector2 _moveInput;
     private Vector2 _lookInput;
     private Vector3 _cameraRelativeInput;
     public Vector3 CurrentVelocity => _characterController.velocity;
 
     public bool IsAlive => !_health.IsDead;
+    public bool CanAim => IsAlive && CurrentStateType != PlayerStateType.Dead;
 
     // Properties for states to access
     public CharacterController CharacterController => _characterController;
@@ -57,12 +63,18 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
         _animationEventProxy = GetComponentInChildren<PlayerAnimationEventProxy>();
         _animator = GetComponentInChildren<Animator>();
         _throwWeaponController = GetComponent<ThrowWeaponController>();
+        _targetFinder = GetComponent<TargetFinder>();
+        _weaponController = GetComponent<WeaponController>();
         _health = GetComponent<Health>();
 
         // Initialize states
         _states[PlayerStateType.Idle] = new PlayerIdleState(this);
         _states[PlayerStateType.Moving] = new PlayerMovingState(this);
         _states[PlayerStateType.Dead] = new PlayerDeadState(this);
+        
+        // Set up targeting event handlers
+        _targetFinder.OnTargetFound += HandleTargetFound;
+        _targetFinder.OnTargetLost += HandleTargetLost;
     }
 
     private void Start()
@@ -77,6 +89,18 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
         ChangeState(PlayerStateType.Idle);
     }
 
+    private void OnDestroy()
+    {
+        _health.OnHealthReachedZero -= HandlePlayerHealthReachedZero;
+        _animationEventProxy.AnimationDieCompletedEvent -= HandleAnimationDieCompleted;
+        
+        if (_targetFinder != null)
+        {
+            _targetFinder.OnTargetFound -= HandleTargetFound;
+            _targetFinder.OnTargetLost -= HandleTargetLost;
+        }
+    }
+
     protected override void Update()
     {
         if (GameplayManager.Instance.IsGamePaused) return;
@@ -87,6 +111,16 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
         }
 
         base.Update();
+        
+        UpdateAiming();
+    }
+    
+    private void UpdateAiming()
+    {
+        if (!CanAim) return;
+        
+        Vector3 aimDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
+        _targetFinder.FindTargetInDirection(aimDirection);
     }
 
     public void SetMoveInput(Vector2 moveInput)
@@ -127,7 +161,19 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
 
     public void Throw()
     {
+        if (!CanAim) return;
         _throwWeaponController.ThrowGrenade();
+    }
+    
+    private void HandleTargetFound(Transform target)
+    {
+        if (!CanAim) return;
+        _weaponController.Aiming(target);
+    }
+    
+    private void HandleTargetLost()
+    {
+        _weaponController.StopAiming();
     }
 
     public void ApplyGravity()
@@ -163,6 +209,12 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
 
     public override void ChangeState(PlayerStateType newStateType)
     {
+        // When changing to dead state, stop aiming
+        if (newStateType == PlayerStateType.Dead)
+        {
+            _weaponController.StopAiming();
+        }
+        
         base.ChangeState(newStateType);
         
         if (newStateType == PlayerStateType.Dead)

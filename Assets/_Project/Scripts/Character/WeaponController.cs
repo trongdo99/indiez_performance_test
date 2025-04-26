@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
@@ -11,14 +12,17 @@ public class WeaponController : MonoBehaviour
     
     [SerializeField] private Transform _leftHandIkTargetTransform;
     [SerializeField] private Transform _leftHandIkHintTransform;
-    [SerializeField] private Transform _targetMarker;
+    [SerializeField] private Transform _aimIKTarget;
     [SerializeField] private Rig _aimRig;
     [SerializeField] private Rig _handsRig;
+    [SerializeField] private float _aimAngleThreshold = 5f;
 
     private PlayerCharacterController _characterController;
     private WeaponBase _weaponBase;
     private Transform _weaponLeftHandAttachTransform;
     private Transform _weaponLeftHandHintTransform;
+    private Transform _currentTargetTransform;
+    private bool _isAiming;
 
     private void Awake()
     {
@@ -28,7 +32,6 @@ public class WeaponController : MonoBehaviour
     private void Start()
     {
         SetUpWeapon(_currentWeapon);
-
         _characterController.OnDeath += HandlePlayerOnDeath;
     }
 
@@ -39,32 +42,58 @@ public class WeaponController : MonoBehaviour
 
     private void Update()
     {
+        // Handle weapon switch input
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             SwitchWeapon(_currentWeapon == WeaponType.Shotgun ? WeaponType.SniperRifle : WeaponType.Shotgun);
         }
         
-        _leftHandIkTargetTransform.position = _weaponLeftHandAttachTransform.position;
-        _leftHandIkTargetTransform.rotation = _weaponLeftHandAttachTransform.rotation;
-        _leftHandIkHintTransform.position = _weaponLeftHandHintTransform.position;
-        _leftHandIkHintTransform.rotation = _weaponLeftHandHintTransform.rotation;
+        // Update IK positions
+        UpdateHandIKPositions();
+        
+        // Check if aiming at target
+        if (_isAiming && _currentTargetTransform != null)
+        {
+            UpdateAimingAndFiring();
+            _aimIKTarget.position = _currentTargetTransform.position;
+        }
     }
-
-    public void Aiming(Transform targetTransform)
+    
+    private void UpdateHandIKPositions()
     {
-        _targetMarker.position = targetTransform.position;
-        _aimRig.weight = 1f;
-
-        Vector3 directionToTarget = (targetTransform.position - _weaponBase.transform.position).normalized;
-        if (Vector3.Angle(_weaponBase.transform.forward, directionToTarget) < 5f)
+        if (_weaponLeftHandAttachTransform != null && _weaponLeftHandHintTransform != null)
+        {
+            _leftHandIkTargetTransform.position = _weaponLeftHandAttachTransform.position;
+            _leftHandIkTargetTransform.rotation = _weaponLeftHandAttachTransform.rotation;
+            _leftHandIkHintTransform.position = _weaponLeftHandHintTransform.position;
+            _leftHandIkHintTransform.rotation = _weaponLeftHandHintTransform.rotation;
+        }
+    }
+    
+    private void UpdateAimingAndFiring()
+    {
+        Vector3 directionToTarget = (_currentTargetTransform.position - _weaponBase.transform.position).normalized;
+        float angle = Vector3.Angle(_weaponBase.transform.forward, directionToTarget);
+        
+        if (angle < _aimAngleThreshold)
         {
             _weaponBase.TryToShoot();
         }
     }
 
+    public void Aiming(Transform targetTransform)
+    {
+        _currentTargetTransform = targetTransform;
+        _aimIKTarget.position = targetTransform.position;
+        _aimRig.weight = 1f;
+        _isAiming = true;
+    }
+
     public void StopAiming()
     {
+        _currentTargetTransform = null;
         _aimRig.weight = 0f;
+        _isAiming = false;
     }
 
     public void SwitchWeapon(WeaponType toWeapon)
@@ -112,5 +141,6 @@ public class WeaponController : MonoBehaviour
     {
         _aimRig.weight = 0f;
         _handsRig.weight = 0f;
+        _isAiming = false;
     }
 }

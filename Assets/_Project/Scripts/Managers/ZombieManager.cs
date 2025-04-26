@@ -37,8 +37,6 @@ public class ZombieManager : MonoBehaviour, ISyncInitializable
         // Initialize pools for each zombie type
         for (int i = 0; i < _zombieTypes.Count; i++)
         {
-            progress?.Report((float)i / _zombieTypes.Count * 0.9f);
-            
             ZombieType zombieType = _zombieTypes[i];
             
             // Cache the controller component

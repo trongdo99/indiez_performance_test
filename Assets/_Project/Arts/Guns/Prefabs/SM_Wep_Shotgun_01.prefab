@@ -114,7 +114,7 @@ MonoBehaviour:
   _spread: {x: 0.3, y: 0.15}
   _collidableLayerMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
   _muzzleFlashEffect: {fileID: 11400000, guid: d138fd0910436614b92ffb3f4712f24b, type: 2}
   _muzzleFlashPosition: {fileID: 3311840160190003668}
   _impactEffect: {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}

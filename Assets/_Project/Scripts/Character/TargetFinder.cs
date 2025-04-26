@@ -3,65 +3,58 @@ using UnityEngine;
 
 public class TargetFinder : MonoBehaviour
 {
-    [SerializeField] private InputReader _input;
+    public event Action<Transform> OnTargetFound;
+    public event Action OnTargetLost;
+    
     [SerializeField] private float _coneAngle = 45f;
     [SerializeField] private float _detectionRadius = 10f;
     [SerializeField] private LayerMask _targetableLayerMask;
+    
+    private Transform _currentTarget;
+    
+    public bool HasTarget => _currentTarget != null;
+    public Transform CurrentTarget => _currentTarget;
+    public float DetectionRadius => _detectionRadius;
+    public float ConeAngle => _coneAngle;
 
-    private WeaponController _weaponController;
-    private Transform _targetTransform;
-
-    private void Awake()
+    public Transform FindTargetInDirection(Vector3 aimDirection)
     {
-        _weaponController = GetComponent<WeaponController>();
-    }
-
-    private void Update()
-    {
-        if (GameplayManager.Instance.IsGamePaused) return;
-        
-        Vector2 lookInput = _input.LookInput;
-        Vector3 aimDirection = new Vector3(lookInput.x, 0, lookInput.y).normalized;
-
-        if (aimDirection.sqrMagnitude > 0.1f)
+        if (aimDirection.sqrMagnitude < 0.1f)
         {
-            _targetTransform = FindTargetInCone(aimDirection);
-
-            if (_targetTransform != null)
+            if (_currentTarget != null && IsTargetInRange(_currentTarget))
             {
-                _weaponController.Aiming(_targetTransform);
+                return _currentTarget;
+            }
+            
+            if (_currentTarget != null)
+            {
+                _currentTarget = null;
+                OnTargetLost?.Invoke();
+            }
+            return null;
+        }
+
+        Transform bestTarget = FindBestTargetInCone(aimDirection);
+        
+        // Check if target changed
+        if (bestTarget != _currentTarget)
+        {
+            _currentTarget = bestTarget;
+            
+            if (bestTarget != null)
+            {
+                OnTargetFound?.Invoke(bestTarget);
             }
             else
             {
-                _weaponController.StopAiming();
+                OnTargetLost?.Invoke();
             }
         }
-        else if (_targetTransform != null && IsTargetInRange(_targetTransform))
-        {
-            _weaponController.Aiming(_targetTransform);
-        }
-        else
-        {
-            _targetTransform = null;
-            _weaponController.StopAiming();
-        }
+        
+        return bestTarget;
     }
 
-    private void LateUpdate()
-    {
-        if (_input.LookInput.sqrMagnitude > 0.01f)
-        {
-            Vector3 aimDirection = new Vector3(_input.LookInput.x, 0, _input.LookInput.y).normalized;
-            DrawCone(aimDirection);
-        }
-
-        if (_targetTransform != null)
-        {
-            Debug.DrawLine(transform.position, _targetTransform.position, Color.green);
-        }
-    }
-
-    private Transform FindTargetInCone(Vector3 aimDirection)
+    private Transform FindBestTargetInCone(Vector3 aimDirection)
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, _detectionRadius, _targetableLayerMask);
         
@@ -90,25 +83,10 @@ public class TargetFinder : MonoBehaviour
 
     private bool IsTargetInRange(Transform targetTransform)
     {
+        if (targetTransform == null) return false;
+        
         Vector3 toTarget = targetTransform.position - transform.position;
         float distance = toTarget.magnitude;
         return distance < _detectionRadius;
-    }
-    
-    private void DrawCone(Vector3 aimDirection)
-    {
-        var rayCount = 50;
-
-        Vector3 origin = transform.position;
-
-        for (int i = 0; i <= rayCount; i++)
-        {
-            float t = i / (float)rayCount;
-            float angle = Mathf.Lerp(-_coneAngle / 2, _coneAngle / 2, t);
-            Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
-            Vector3 dir = rot * aimDirection;
-
-            Debug.DrawLine(origin, origin + dir * _detectionRadius, Color.red);
-        }
     }
 }
