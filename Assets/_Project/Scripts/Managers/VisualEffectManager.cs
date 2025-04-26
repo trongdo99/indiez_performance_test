@@ -249,7 +249,7 @@ public class VisualEffectManager : MonoBehaviour, ISyncInitializable
         {
             _activeEffects.Remove(effect);
 
-            // Get the effect ID directly from our tracking dictionary
+            // Get the effect ID directly from the tracking dictionary
             string effectId = GetEffectIdForInstance(effect);
             if (!string.IsNullOrEmpty(effectId))
             {

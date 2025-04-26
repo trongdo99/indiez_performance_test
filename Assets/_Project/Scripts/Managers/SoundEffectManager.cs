@@ -196,7 +196,7 @@ public class SoundEffectManager : MonoBehaviour, ISyncInitializable
         {
             _activeSounds.Remove(sound);
             
-            // Get the sound ID directly from our tracking dictionary
+            // Get the sound ID directly from the tracking dictionary
             if (_soundToIdMap.TryGetValue(sound, out string soundId))
             {
                 // Decrement the counter

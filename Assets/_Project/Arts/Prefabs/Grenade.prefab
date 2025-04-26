@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detonationTime: 3
-  _explosionRadius: 5
+  _explosionRadius: 2
   _explosionDamage: 100
   _explosionForce: 500
   _damageLayers:
