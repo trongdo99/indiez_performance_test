@@ -127,6 +127,7 @@ Transform:
   - {fileID: 4240335478219364}
   - {fileID: 4830259015038390}
   - {fileID: 4665040910819672}
+  - {fileID: 3889445534905492994}
   - {fileID: 7290705069605600051}
   - {fileID: 7990562457021051580}
   m_Father: {fileID: 4965903702048206}
@@ -2274,6 +2275,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 0
   m_Effectors: []
+--- !u!1 &5151202552108132297
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3889445534905492994}
+  m_Layer: 0
+  m_Name: ThrowPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3889445534905492994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5151202552108132297}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.72616357, y: -0.40102306, z: -0.5114304, w: 0.22429027}
+  m_LocalPosition: {x: -0.39913663, y: -0.40978697, z: -0.28361264}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4875715716804884}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5603971985796295235
 GameObject:
   m_ObjectHideFlags: 0

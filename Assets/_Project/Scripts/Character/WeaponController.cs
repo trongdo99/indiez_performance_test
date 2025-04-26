@@ -48,14 +48,27 @@ public class WeaponController : MonoBehaviour
             SwitchWeapon(_currentWeapon == WeaponType.Shotgun ? WeaponType.SniperRifle : WeaponType.Shotgun);
         }
         
-        // Update IK positions
+        UpdateHandsIK();
+        
         UpdateHandIKPositions();
         
         // Check if aiming at target
-        if (_isAiming && _currentTargetTransform != null)
+        if (!_characterController.IsThrowing && _isAiming && _currentTargetTransform != null)
         {
             UpdateAimingAndFiring();
             _aimIKTarget.position = _currentTargetTransform.position;
+        }
+    }
+
+    private void UpdateHandsIK()
+    {
+        if (_characterController.IsThrowing)
+        {
+            _handsRig.weight = 0f;
+        }
+        else
+        {
+            _handsRig.weight = 1f;
         }
     }
     
@@ -79,6 +92,11 @@ public class WeaponController : MonoBehaviour
         {
             _weaponBase.TryToShoot();
         }
+    }
+
+    public void SetWeaponVisibility(bool isVisible)
+    {
+        GetCurrentWeaponModel(_currentWeapon).SetActive(isVisible);;
     }
 
     public void Aiming(Transform targetTransform)
@@ -122,6 +140,19 @@ public class WeaponController : MonoBehaviour
                 _weaponLeftHandHintTransform = _sniperRifle.transform.GetChild(1).transform;
                 break;
         }
+    }
+
+    private GameObject GetCurrentWeaponModel(WeaponType weapon)
+    {
+        switch (weapon)
+        {
+            case WeaponType.Shotgun:
+                return _shotgun;
+            case WeaponType.SniperRifle:
+                return _sniperRifle;
+        }
+
+        return null;
     }
 
     private void CleanUpPreviousWeapon(WeaponType weapon)

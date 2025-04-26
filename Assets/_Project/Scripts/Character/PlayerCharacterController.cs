@@ -38,7 +38,8 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
     public Vector3 CurrentVelocity => _characterController.velocity;
 
     public bool IsAlive => !_health.IsDead;
-    public bool CanAim => IsAlive && CurrentStateType != PlayerStateType.Dead;
+    public bool IsThrowing => _throwWeaponController.IsThrowingAnimation;
+    public bool CanAim => IsAlive && CurrentStateType != PlayerStateType.Dead && !IsThrowing;
 
     // Properties for states to access
     public CharacterController CharacterController => _characterController;
@@ -162,7 +163,8 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
     public void Throw()
     {
         if (!CanAim) return;
-        _throwWeaponController.ThrowGrenade();
+        _animator.SetTrigger(AnimatorParameters.Throw);
+        _throwWeaponController.StartThrowSequence();
     }
     
     private void HandleTargetFound(Transform target)
@@ -186,6 +188,8 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
 
     public void RotateTowardTargetDirection()
     {
+        if (IsThrowing) return;
+        
         Vector3 targetDirection = new Vector3(_lookInput.x, 0, _lookInput.y).normalized;
         
         if (targetDirection.magnitude > 0.01f)

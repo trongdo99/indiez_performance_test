@@ -12,10 +12,37 @@ public class ThrowWeaponController : MonoBehaviour
     
     private float _lastThrowTime;
     private TargetFinder _targetFinder;
+    private PlayerAnimationEventProxy _playerAnimationEventProxy;
+    private WeaponController _weaponController;
+    private bool _isThrowingAnimation;
+    
+    public bool IsThrowingAnimation => _isThrowingAnimation;
 
     private void Awake()
     {
         _targetFinder = GetComponent<TargetFinder>();
+        _playerAnimationEventProxy = GetComponentInChildren<PlayerAnimationEventProxy>();
+        _weaponController = GetComponent<WeaponController>();
+    }
+
+    private void Start()
+    {
+        _playerAnimationEventProxy.AnimationThrowEvent += HandleAnimationThrow;
+        _playerAnimationEventProxy.AnimationThrowEndedEvent += HandleAnimationThrowEnded;
+    }
+
+    private void OnDestroy()
+    {
+        _playerAnimationEventProxy.AnimationThrowEvent -= HandleAnimationThrow;
+        _playerAnimationEventProxy.AnimationThrowEndedEvent -= HandleAnimationThrowEnded;
+    }
+
+    public void StartThrowSequence()
+    {
+        _isThrowingAnimation = true;
+        
+        _weaponController.SetWeaponVisibility(false);
+        _weaponController.StopAiming();
     }
 
     public void ThrowGrenade()
@@ -125,5 +152,17 @@ public class ThrowWeaponController : MonoBehaviour
         result.y = verticalVelocity;
         
         return result;
+    }
+
+    private void HandleAnimationThrow()
+    {
+        ThrowGrenade();
+    }
+
+    private void HandleAnimationThrowEnded()
+    {
+        _isThrowingAnimation = false;
+        
+        _weaponController.SetWeaponVisibility(true);
     }
 }
