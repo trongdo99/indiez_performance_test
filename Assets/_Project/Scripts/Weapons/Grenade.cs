@@ -11,6 +11,7 @@ public class Grenade : MonoBehaviour
     [SerializeField] private float _explosionForce = 500f;
     [SerializeField] private LayerMask _damageLayers;
     [SerializeField] private VisualEffectData _explosionEffect;
+    [SerializeField] private SoundEffectData _explosionSoundEffectData;
     
     private Rigidbody _rigidbody;
     private bool _hasDetonated;
@@ -43,6 +44,8 @@ public class Grenade : MonoBehaviour
     {
         if (_hasDetonated) return;
         _hasDetonated = true;
+        
+        SoundEffectManager.Instance.PlaySound(_explosionSoundEffectData, transform.position);
 
         VisualEffectManager.Instance.PlayEffect(_explosionEffect, transform.position, Quaternion.identity);
         

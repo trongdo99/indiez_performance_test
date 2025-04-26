@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af55f17f9112ec479b771df81240551, type: 3}
+  m_Name: GrenadeExplosionSoundEffect
+  m_EditorClassIdentifier: 
+  _soundId: GrenadeExplosionSoundEffect
+  _soundEffectPrefab: {fileID: 5179745199236531520, guid: bfd2a63676edeb946b291eee8b61bc44, type: 3}
+  _audioClip: {fileID: 8300000, guid: 997c4c382275b834dbf0a673b117d93d, type: 3}
+  _initialPoolSize: 1
+  _volume: 1
+  _pitch: 1
+  _spatialBlend: 0
+  _loop: 0
+  _minDistance: 1
+  _maxDistance: 500
+  _maxConcurrentInstances: 10
+  _preventDuplicates: 0
+  _duplicateTimeout: 0.1

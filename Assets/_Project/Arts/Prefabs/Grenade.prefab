@@ -103,6 +103,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   _explosionEffect: {fileID: 11400000, guid: 7c9a93127c540ea4b96bae78af0403d9, type: 2}
+  _explosionSoundEffectData: {fileID: 11400000, guid: b5ff41d005da307478fd7e012e04bca6, type: 2}
 --- !u!1001 &8190763348615532300
 PrefabInstance:
   m_ObjectHideFlags: 0
