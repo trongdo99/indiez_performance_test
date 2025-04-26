@@ -152,8 +152,14 @@ MonoBehaviour:
   _grenade: {fileID: 1067534318223756700, guid: 83bb90addc1fcfa4395208198a28f66c, type: 3}
   _throwPoint: {fileID: 101169546769876880}
   _throwCoolDown: 1
-  _maxThrowHeight: 4
-  _initialThrowSpeed: 2
+  _minThrowSpeed: 10
+  _maxThrowSpeed: 20
+  _maxThrowDistance: 15
+  _arcHeight: 3
+  _minimumArcHeight: 1.5
+  _showThrowPath: 1
+  _pathSegments: 50
+  _pathColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &8089014164323046394
 MonoBehaviour:
   m_ObjectHideFlags: 0
