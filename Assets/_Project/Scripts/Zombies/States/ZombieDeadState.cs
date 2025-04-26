@@ -8,6 +8,8 @@
         
         if (_zombieController.CurrentStateType != ZombieStateType.Ragdoll)
         {
+            _zombieController.Collider.enabled = false;
+            
             _zombieController.Animator.enabled = true;
             _zombieController.Animator.SetTrigger(AnimatorParameters.ZombieDie);
             

@@ -55,6 +55,7 @@ public class ZombieRagdollState : ZombieState
 
     private void PlayDeathAnimation()
     {
+        _zombieController.Collider.enabled = false;
         _zombieController.Rigidbody.isKinematic = true;
         _zombieController.TargetCollider.enabled = false;
         
