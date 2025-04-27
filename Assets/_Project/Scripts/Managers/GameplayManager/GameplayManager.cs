@@ -29,6 +29,11 @@ public class GameplayManager : StateMachine<GameplayStateType>, ISyncInitializab
     public float PauseStartTime { get => _pauseStartTime; set => _pauseStartTime = value; }
     public float TotalPausedTime { get => _totalPausedTime; set => _totalPausedTime = value; }
 
+    public IState GetState(GameplayStateType stateType)
+    {
+        return _states[stateType];
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

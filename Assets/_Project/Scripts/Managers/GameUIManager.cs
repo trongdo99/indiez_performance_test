@@ -16,6 +16,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private TMP_Text _countdownText;
     [SerializeField] private TMP_Text _waveText;
     [SerializeField] private TMP_Text _killsCounter;
+    [SerializeField] private GameObject _victoryPanel;
     
     public void Initialize(IProgress<float> progress = null)
     {
@@ -31,6 +32,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Subscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
         EventBus.Instance.Subscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
         EventBus.Instance.Subscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
+        EventBus.Instance.Subscribe<GameEvents.ShowVictoryPanel>(HandleShowVictoryPanel);
     }
 
     private void OnDisable()
@@ -42,6 +44,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Unsubscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
         EventBus.Instance.Unsubscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
         EventBus.Instance.Unsubscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
+        EventBus.Instance.Unsubscribe<GameEvents.ShowVictoryPanel>(HandleShowVictoryPanel);
     }
 
     private void HandleGameStateChanged(EventData.GameStateChangedData data)
@@ -69,6 +72,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         _gameplayHUD.SetActive(false);
         _countDownPanel.SetActive(false);
         _gameOverPanel.SetActive(false);
+        _victoryPanel.SetActive(false);
     }
     
     private void HandleOnCountDownTick(EventData.GameStartingCountDownData data)
@@ -138,6 +142,44 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     private void HandleTotalZombiesKilled(EventData.TotalZombiesKilledData data)
     {
         _killsCounter.text = $"{data.TotalZombiesKilled} KILLS";
+    }
+
+    private void HandleShowVictoryPanel()
+    {
+        _gameplayHUD.SetActive(false);
+        
+        _victoryPanel.SetActive(true);
+        
+        StartCoroutine(AnimateVictoryPanel());
+    }
+
+    private IEnumerator AnimateVictoryPanel()
+    {
+        if (_victoryPanel == null) yield break;
+        
+        var canvasGroup = _victoryPanel.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            _victoryPanel.AddComponent<CanvasGroup>();
+        }
+        
+        canvasGroup.alpha = 0f;
+        
+        var duration = 1f;
+        var elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / duration);
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        
+        canvasGroup.alpha = 1f;
+        
+        Time.timeScale = 1f;
+
+        canvasGroup.enabled = false;
     }
 
     public async void UI_RestartButtonClicked()

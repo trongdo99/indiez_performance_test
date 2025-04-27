@@ -17,6 +17,9 @@ public static class GameEvents
     // Game countdown events
     public struct GameStartingCountDown { }
     public struct GameStartingCountDownCompleted { }
+    
+    // UI events
+    public struct ShowVictoryPanel { }
 }
 
 public static class EventData

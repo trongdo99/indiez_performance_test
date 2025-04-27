@@ -47,32 +47,7 @@ MonoBehaviour:
   _spawnPoints: []
   _waves:
   - WaveName: 1
-    ZombiesToSpawn: 10
-    SpawnRate: 1
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  - WaveName: 2
-    ZombiesToSpawn: 20
-    SpawnRate: 1
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  - WaveName: 3
-    ZombiesToSpawn: 30
-    SpawnRate: 2
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  - WaveName: 4
-    ZombiesToSpawn: 40
-    SpawnRate: 2
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  - WaveName: 6
-    ZombiesToSpawn: 50
-    SpawnRate: 2
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  - WaveName: 7
-    ZombiesToSpawn: 60
+    ZombiesToSpawn: 1
     SpawnRate: 1
     ZombiesRemaining: 0
     ZombiesKilled: 0
