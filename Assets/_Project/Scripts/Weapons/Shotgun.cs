@@ -18,6 +18,8 @@ public class Shotgun : WeaponBase
         
         PlayGunShotSoundEffect();
         
+        PlayImpulseEffect();
+        
         if (_useRandomizedSpread)
         {
             // Random spread pattern

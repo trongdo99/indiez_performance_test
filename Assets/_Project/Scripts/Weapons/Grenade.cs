@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Grenade : MonoBehaviour
 {
+    [Header("Grenade Settings")]
     [SerializeField] private float _detonationTime = 3f;
     [SerializeField] private float _explosionRadius = 5f;
     [SerializeField] private float _explosionDamage = 100f;
@@ -13,12 +15,40 @@ public class Grenade : MonoBehaviour
     [SerializeField] private VisualEffectData _explosionEffect;
     [SerializeField] private SoundEffectData _explosionSoundEffectData;
     
+    [Header("Camera Shake")]
+    [SerializeField] protected CinemachineImpulseSource _impulseSource;
+    [SerializeField] protected CinemachineImpulseDefinition.ImpulseShapes _impulseShape = CinemachineImpulseDefinition.ImpulseShapes.Explosion;
+    [SerializeField] [Range(0.1f, 3f)] protected float _impulseAmplitude = 1f;
+    [SerializeField] [Range(0.1f, 3f)] protected float _impulseFrequency = 1f;
+    [SerializeField] [Range(0.05f, 1f)] protected float _impulseDuration = 0.2f;
+    [SerializeField] protected Vector3 _impulseDirection = new Vector3(0f, -1f, 0f);
+    
     private Rigidbody _rigidbody;
     private bool _hasDetonated;
     
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        
+        SetupCameraShake();
+    }
+
+    private void SetupCameraShake()
+    {
+        if (_impulseSource == null)
+        {
+            _impulseSource = GetComponent<CinemachineImpulseSource>();
+            if (_impulseSource == null)
+            {
+                _impulseSource = gameObject.AddComponent<CinemachineImpulseSource>();
+            }
+        }
+
+        _impulseSource.ImpulseDefinition.ImpulseShape = _impulseShape;
+        _impulseSource.ImpulseDefinition.AmplitudeGain = _impulseAmplitude;
+        _impulseSource.ImpulseDefinition.FrequencyGain = _impulseFrequency;
+        _impulseSource.ImpulseDefinition.ImpulseDuration = _impulseDuration;
+        _impulseSource.DefaultVelocity = _impulseDirection.normalized;
     }
 
     public void Initialize(Vector3 initialVelocity)
@@ -45,6 +75,8 @@ public class Grenade : MonoBehaviour
         if (_hasDetonated) return;
         _hasDetonated = true;
         
+        PlayImpulseEffect();
+        
         SoundEffectManager.Instance.PlaySound(_explosionSoundEffectData, transform.position);
 
         VisualEffectManager.Instance.PlayEffect(_explosionEffect, transform.position, Quaternion.identity);
@@ -69,6 +101,13 @@ public class Grenade : MonoBehaviour
         }
         
         Destroy(gameObject);
+    }
+
+    private void PlayImpulseEffect()
+    {
+        if (_impulseSource == null) return;
+        
+        _impulseSource.GenerateImpulse();
     }
 
     private void OnDrawGizmos()

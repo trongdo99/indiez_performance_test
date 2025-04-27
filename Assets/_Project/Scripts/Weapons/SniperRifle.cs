@@ -12,6 +12,8 @@ public class SniperRifle : WeaponBase
         
         PlayGunShotSoundEffect();
         
+        PlayImpulseEffect();
+        
         FireProjectile();
 
         return true;
