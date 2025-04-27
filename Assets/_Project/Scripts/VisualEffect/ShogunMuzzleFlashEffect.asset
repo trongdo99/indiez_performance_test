@@ -19,6 +19,7 @@ MonoBehaviour:
   _lifetime: 2
   _scale: 1
   _useParticleSystemLifetime: 1
+  _autoDeactivate: 1
   _maxConcurrentInstances: 10
   _simplifyOnLowQuality: 1
   _particleCountScale: 0.7

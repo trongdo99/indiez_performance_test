@@ -86,39 +86,32 @@ public class GameInitializer : MonoBehaviour
     private async Task InitializeManagers(Transform parent)
     {
         // Initialize manaagers in the following order:
-        try
-        {
-            // 0. EventBus
-            await InitializeManager<EventBus>(_eventBusPrefab, "EventBus", parent);
-            
-            // 1. ObjectPoolManager
-            await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
-            
-            // 2. VisualEffectManager
-            await InitializeManager<VisualEffectManager>(_visualEffectManagerPrefab, "VisualEffectManager", parent);
-            
-            // 3. SoundEffectManager
-            await InitializeManager<SoundEffectManager>(_soundEffectManagerPrefab, "SoundEffectManager", parent);
-            
-            // 4. GameplayManager
-            await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
-            
-            // 5. GameUIManager
-            await InitializeManager<GameUIManager>(_gameUIManagerPrefab, "GameUIManager", parent);
-            
-            // 6. ZombieManager
-            _zombieManager = await InitializeManager<ZombieManager>(_zombieManagerPrefab, "ZombieManager", parent);
+        // 0. EventBus
+        await InitializeManager<EventBus>(_eventBusPrefab, "EventBus", parent);
+        
+        // 1. ObjectPoolManager
+        await InitializeManager<ObjectPoolManager>(_objectPoolManagerPrefab, "ObjectPoolManager", parent);
+        
+        // 2. VisualEffectManager
+        await InitializeManager<VisualEffectManager>(_visualEffectManagerPrefab, "VisualEffectManager", parent);
+        
+        // 3. SoundEffectManager
+        await InitializeManager<SoundEffectManager>(_soundEffectManagerPrefab, "SoundEffectManager", parent);
+        
+        // 4. GameplayManager
+        await InitializeManager<GameplayManager>(_gameplayManagerPrefab, "GameplayManager", parent);
+        
+        // 5. GameUIManager
+        await InitializeManager<GameUIManager>(_gameUIManagerPrefab, "GameUIManager", parent);
+        
+        // 6. ZombieManager
+        _zombieManager = await InitializeManager<ZombieManager>(_zombieManagerPrefab, "ZombieManager", parent);
 
-            // 7. ZombieSpawnManager
-            await InitializeManager<ZombieSpawnManager>(_zombieSpawnManagerPrefab, "ZombieSpawnManager", parent);
+        // 7. ZombieSpawnManager
+        await InitializeManager<ZombieSpawnManager>(_zombieSpawnManagerPrefab, "ZombieSpawnManager", parent);
 
-            // 8. PlayerManager
-            _player = await InitializeManager<Player>(_playerManagerPrefab, "PlayerManager", parent);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error during manager initialization: {e.Message}");
-        }
+        // 8. PlayerManager
+        _player = await InitializeManager<Player>(_playerManagerPrefab, "PlayerManager", parent);
     }
 
     private void SetupDependencies()
@@ -147,7 +140,7 @@ public class GameInitializer : MonoBehaviour
                 UpdateProgress(_currentProgress);
             }
 
-            throw new InvalidOperationException($"Prefab for {managerName} is not assigned");
+            return null;
         }
         
         Debug.Log($"Initializing {managerName} ...");

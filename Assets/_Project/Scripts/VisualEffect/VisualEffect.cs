@@ -68,9 +68,9 @@ public class VisualEffect : MonoBehaviour, IPoolable
         {
             // For non-looping effects, check if all particle systems have stopped
             shouldComplete = true;
-            foreach (var ps in _particleSystems)
+            foreach (ParticleSystem ps in _particleSystems)
             {
-                if (ps.isPlaying && ps.particleCount > 0)
+                if (ps.isPlaying || ps.isEmitting)
                 {
                     shouldComplete = false;
                     break;
