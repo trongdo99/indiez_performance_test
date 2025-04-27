@@ -29,6 +29,7 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     [SerializeField] private bool _debugDummy;
 
     private ZombieManager _zombieManager;
+    private ZombieSoundController _zombieSoundController;
     private ZombieDissolveEffect _dissolveEffect;
     private Health _health;
     private Animator _animator;
@@ -42,6 +43,7 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     // Properties for states to access
     public ZombieHitBox HitBox => _hitBox;
     public ZombieAnimationEventProxy AnimationEventProxy => _animationEventProxy;
+    public ZombieSoundController ZombieSoundController => _zombieSoundController;
     public Transform AimAtPosition => _aimAtPosition;
     public LayerMask GroundLayerMask => _groundLayerMask;
     public float AttackRange => _attackRange;
@@ -56,10 +58,12 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     public Rigidbody Rigidbody => _rigidbody;
     public Transform Target => _target;
     public Health TargetHealth => _targetHealth;
+    public bool IsAlive => !_health.IsDead;
     public float LastAttackTime { get => _lastAttackTime; set => _lastAttackTime = value; }
 
     private void Awake()
     {
+        _zombieSoundController = GetComponent<ZombieSoundController>();
         _agent = GetComponent<NavMeshAgent>();
         _health = GetComponent<Health>();
         _animator = GetComponentInChildren<Animator>();
@@ -176,6 +180,8 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
         }
         
         _zombieManager.HandleZombieDeath(this);
+        
+        _zombieSoundController.PlayDeathSound();
     }
 
     private void HandleOnDissolveCompleted()
@@ -219,6 +225,9 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
         
         // Reset attack timer
         _lastAttackTime = 0f;
+        
+        // Reset zombie sound controller
+        _zombieSoundController.Reset();
     }
 
     public void OnReleaseToPool()
@@ -228,8 +237,12 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
         // Clear target
         _target = null;
         _targetHealth = null;
+        
+        // Stop zombie sound controller
+        _zombieSoundController.StopMoaning();
     
         // Stop any coroutines
         StopAllCoroutines();
+        
     }
 }

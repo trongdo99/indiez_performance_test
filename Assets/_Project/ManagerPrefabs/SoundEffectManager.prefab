@@ -52,5 +52,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c6db7643f4a7f464b9abeb6fe092135e, type: 2}
   - {fileID: 11400000, guid: c7e2618b0ba1d58409e9f3c84489f955, type: 2}
   - {fileID: 11400000, guid: b5ff41d005da307478fd7e012e04bca6, type: 2}
+  - {fileID: 11400000, guid: 229664000e91b544aa5464c8110defcb, type: 2}
+  - {fileID: 11400000, guid: ce52b3ceccaa3254e8c7307583c42c74, type: 2}
+  - {fileID: 11400000, guid: 775c056916c1e6c4faef5545781458b2, type: 2}
+  - {fileID: 11400000, guid: af5d8f15c5e5b784f98a81cc9075d350, type: 2}
+  - {fileID: 11400000, guid: cc75a2612b597e74cab6bfcbb942fbd2, type: 2}
   _masterVolume: 1
   _sfxVolume: 1

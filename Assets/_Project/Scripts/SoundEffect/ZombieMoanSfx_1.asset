@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af55f17f9112ec479b771df81240551, type: 3}
+  m_Name: ZombieMoanSfx_1
+  m_EditorClassIdentifier: 
+  _soundId: ZombieMoanSfx_1
+  _soundEffectPrefab: {fileID: 7436257621031213312, guid: 5b1bfb4facd946c4f881eef46a07ff9a, type: 3}
+  _audioClip: {fileID: 8300000, guid: 9d31f6e4630735d4fb989f1921c6d44f, type: 3}
+  _initialPoolSize: 1
+  _volume: 1
+  _pitch: 1
+  _spatialBlend: 0
+  _loop: 0
+  _minDistance: 1
+  _maxDistance: 500
+  _maxConcurrentInstances: 10
+  _preventDuplicates: 0
+  _duplicateTimeout: 0.1

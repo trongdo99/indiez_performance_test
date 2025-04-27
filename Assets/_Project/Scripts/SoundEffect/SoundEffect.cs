@@ -55,6 +55,11 @@ public class SoundEffect : MonoBehaviour, IPoolable
     {
         _onSoundComplete = callback;
     }
+
+    public Action<SoundEffect> GetOnCompleteCallback()
+    {
+        return _onSoundComplete;
+    }
     
     public void CompleteSound()
     {
