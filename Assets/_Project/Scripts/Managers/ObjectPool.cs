@@ -83,7 +83,7 @@ public class ObjectPool<T> where T : Component, IPoolable
         }
         else if (_shouldExpand)
         {
-            obj = CreateNewInstance(true);
+            obj = CreateNewInstance();
             if (obj == null)
             {
                 // Return the oldest active object if we can't create more
