@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WaveName: Wave 5
   ZombiesToSpawn: 50
-  SpawnRate: 3
+  SpawnRate: 2
   ZombieTypes:
   - ZombieTypeIndex: 0
-    Weight: 0
+    Weight: 0.3
+  - ZombieTypeIndex: 1
+    Weight: 0.7

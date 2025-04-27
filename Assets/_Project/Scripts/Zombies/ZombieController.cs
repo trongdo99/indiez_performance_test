@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public enum ZombieStateType
 {
@@ -25,6 +26,14 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     [SerializeField] private float _attackCoolDown = 2f;
     [SerializeField] private float _damageToHealth = -20f;
     [SerializeField] private float _ragdollRecoveryTime = 3f;
+
+    [SerializeField] private float _speedMultiplier = 1f;
+    [SerializeField] private float _baseMovementSpeed = 1.5f;
+    [SerializeField] private float _minSpeedVariation = 0.8f;
+    [SerializeField] private float _maxSpeedVariation = 1.2f;
+    [SerializeField] private float _baseRotationSpeed = 90f;
+    [SerializeField] private float _minRotationSpeedVariation = 0.8f;
+    [SerializeField] private float _maxRotationSpeedVariation = 1.2f;
     
     [SerializeField] private bool _debugDummy;
 
@@ -39,6 +48,10 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     private float _lastAttackTime;
     private Transform _target;
     private Health _targetHealth;
+    private float _currentSpeedVariation;
+    private float _effectiveMovementSpeed;
+    private float _currentRotationSpeedVariation;
+    private float _effectiveRotationSpeed;
 
     // Properties for states to access
     public ZombieHitBox HitBox => _hitBox;
@@ -61,6 +74,19 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
     public bool IsAlive => !_health.IsDead;
     public float LastAttackTime { get => _lastAttackTime; set => _lastAttackTime = value; }
 
+    public float SpeedMultiplier
+    {
+        get => _speedMultiplier;
+        set
+        {
+            _speedMultiplier = value;
+            if (_animator != null)
+            {
+                _animator.speed = value;
+            }
+        }
+    }
+
     private void Awake()
     {
         _zombieSoundController = GetComponent<ZombieSoundController>();
@@ -72,12 +98,38 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
         _rigidbody = GetComponent<Rigidbody>();
         _rigidbody.isKinematic = true;
 
+        InitializeSpeedVariation();
+
         // Initialize states
         _states[ZombieStateType.Idle] = new ZombieIdleState(this);
         _states[ZombieStateType.Chasing] = new ZombieChaseState(this);
         _states[ZombieStateType.Attacking] = new ZombieAttackState(this);
         _states[ZombieStateType.Ragdoll] = new ZombieRagdollState(this);
         _states[ZombieStateType.Dead] = new ZombieDeadState(this);
+    }
+
+    private void InitializeSpeedVariation()
+    {
+        _currentSpeedVariation = Random.Range(_minSpeedVariation, _maxSpeedVariation);
+        _currentRotationSpeedVariation = Random.Range(_minRotationSpeedVariation, _maxRotationSpeedVariation);
+        UpdateEffectiveSpeed();
+
+        if (_animator != null)
+        {
+            _animator.speed = _speedMultiplier;
+        }
+    }
+
+    private void UpdateEffectiveSpeed()
+    {
+        _effectiveMovementSpeed = _baseMovementSpeed * _currentSpeedVariation * _speedMultiplier;
+        _effectiveRotationSpeed = _baseRotationSpeed * _currentRotationSpeedVariation * _speedMultiplier;
+
+        if (_agent != null && _agent.isActiveAndEnabled)
+        {
+            _agent.speed = _effectiveMovementSpeed;
+            _agent.angularSpeed = _effectiveRotationSpeed;
+        }
     }
 
     private void OnEnable()
@@ -228,6 +280,9 @@ public class ZombieController : StateMachine<ZombieStateType>, IPoolable
         
         // Reset zombie sound controller
         _zombieSoundController.Reset();
+        
+        // Reset speed variation
+        InitializeSpeedVariation();
     }
 
     public void OnReleaseToPool()

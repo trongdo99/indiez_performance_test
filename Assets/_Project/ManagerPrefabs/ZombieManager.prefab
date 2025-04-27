@@ -47,3 +47,9 @@ MonoBehaviour:
   _zombieTypes:
   - TypeName: Normal
     ZombiePrefab: {fileID: 4790168810827744405, guid: 413091cf8762a2942981229689fd90a0, type: 3}
+    InitialPoolSize: 10
+    Controller: {fileID: 0}
+  - TypeName: Fast Zombie
+    ZombiePrefab: {fileID: 4790168810827744405, guid: e0a7ff39db16be740bd51514f0a697dd, type: 3}
+    InitialPoolSize: 10
+    Controller: {fileID: 0}
