@@ -35,8 +35,10 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
     private Vector2 _moveInput;
     private Vector2 _lookInput;
     private Vector3 _cameraRelativeInput;
+    
     public Vector3 CurrentVelocity => _characterController.velocity;
-
+    public float MaxHealth => _health.MaxHealth;
+    public float CurrentHealth => _health.CurrentHealth;
     public bool IsAlive => !_health.IsDead;
     public bool IsThrowing => _throwWeaponController.IsThrowingAnimation;
     public bool CanAim => IsAlive && CurrentStateType != PlayerStateType.Dead && !IsThrowing;
@@ -84,6 +86,7 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
         _camera = Camera.main;
 
         _health.OnHealthReachedZero += HandlePlayerHealthReachedZero;
+        _health.OnHealthChanged += HandleHealthChanged;
         _animationEventProxy.AnimationDieCompletedEvent += HandleAnimationDieCompleted;
 
         // Start in idle state
@@ -93,6 +96,7 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
     private void OnDestroy()
     {
         _health.OnHealthReachedZero -= HandlePlayerHealthReachedZero;
+        _health.OnHealthChanged -= HandleHealthChanged;
         _animationEventProxy.AnimationDieCompletedEvent -= HandleAnimationDieCompleted;
         
         if (_targetFinder != null)
@@ -210,6 +214,16 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
     private void HandlePlayerHealthReachedZero()
     {
         ChangeState(PlayerStateType.Dead);
+    }
+
+    private void HandleHealthChanged(float newHealth, float previousHealth)
+    {
+        EventBus.Instance.Publish<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(new EventData.PlayerHealthChangedData
+        {
+            PlayerController = this,
+            NewHealth = newHealth,
+            PreviousHealth = previousHealth,
+        });
     }
 
     private void HandleAnimationDieCompleted()

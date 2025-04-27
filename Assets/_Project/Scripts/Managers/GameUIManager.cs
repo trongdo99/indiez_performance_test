@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour, ISyncInitializable
 {
@@ -10,7 +11,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private GameObject _gameplayHUD;
     [SerializeField] private GameObject _pausedPanel;
     [SerializeField] private GameObject _virtualButtons;
-    
+    [SerializeField] private Slider _healthSlider;
     [SerializeField] private GameObject _countDownPanel;
     [SerializeField] private TMP_Text _countdownText;
     
@@ -25,6 +26,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Subscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);
         EventBus.Instance.Subscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
         EventBus.Instance.Subscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
+        EventBus.Instance.Subscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
     }
 
     private void OnDisable()
@@ -33,6 +35,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDown, EventData.GameStartingCountDownData>(HandleOnCountDownTick);
         EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
         EventBus.Instance.Unsubscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
+        EventBus.Instance.Unsubscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
     }
 
     private void HandleGameStateChanged(EventData.GameStateChangedData data)
@@ -107,6 +110,11 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     private void HandleOnCountDownCompleted()
     {
         _countDownPanel.SetActive(false);
+    }
+
+    private void HandlePlayerHealthChanged(EventData.PlayerHealthChangedData data)
+    {
+        _healthSlider.value = Mathf.Clamp01(data.PlayerController.CurrentHealth / data.PlayerController.MaxHealth);
     }
 
     public async void UI_RestartButtonClicked()

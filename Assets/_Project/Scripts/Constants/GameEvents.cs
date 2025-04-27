@@ -2,6 +2,7 @@ public static class GameEvents
 {
     // Player events
     public struct PlayerDeathAnimationCompleted { }
+    public struct PlayerHealthChanged { }
     
     // Waves events
     public struct AllWavesCompleted { }
@@ -31,5 +32,12 @@ public static class EventData
     public class GameStartingCountDownData
     {
         public int Seconds { get; set; }
+    }
+    
+    public class PlayerHealthChangedData
+    {
+        public PlayerCharacterController  PlayerController { get; set; }
+        public float NewHealth { get; set; }
+        public float PreviousHealth { get; set; }
     }
 }
