@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -39,6 +40,16 @@ public class Bootstrapper : MonoBehaviour
             AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorBuildSettings.scenes[SceneIndex].path);
 #endif
     }
+    
+    [SerializeField] private SceneLoader _sceneLoader;
+    [SerializeField] private AudioManager _audioManager;
+
+    private void Awake()
+    {
+        Instantiate(_sceneLoader);
+        Instantiate(_audioManager);
+    }
+    
 }
 
 #if UNITY_EDITOR

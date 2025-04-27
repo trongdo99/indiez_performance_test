@@ -7,7 +7,9 @@ using UnityEngine.UI;
 public class SceneLoader : MonoBehaviour
 {
     public static SceneLoader Instance { get; private set; }
-
+    
+    public event Action<string> OnSceneLoaded;
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -17,7 +19,7 @@ public class SceneLoader : MonoBehaviour
         }
         Instance = this;
     }
-
+    
     [SerializeField] private Slider _loadingBar;
     [SerializeField] private float _fillSpeed = 0.5f;
     [SerializeField] private GameObject _loadingScreen;
@@ -32,9 +34,11 @@ public class SceneLoader : MonoBehaviour
     private bool _isLoading;
     
     private readonly GameSceneManager _gameSceneManager = new GameSceneManager();
-
+    
     private async void Start()
     {
+        _gameSceneManager.OnSceneLoaded += HandleSceneLoaded;
+        
 #if UNITY_EDITOR
         if (!string.IsNullOrEmpty(Bootstrapper.ActiveScenePath))
         {
@@ -54,14 +58,24 @@ public class SceneLoader : MonoBehaviour
 
         await LoadSceneAsync("MainMenu");
     }
-
+    
+    private void OnDestroy()
+    {
+        _gameSceneManager.OnSceneLoaded -= HandleSceneLoaded;
+    }
+    
+    private void HandleSceneLoaded(string sceneName)
+    {
+        OnSceneLoaded?.Invoke(sceneName);
+    }
+    
     private void Update()
     {
         if (!_isLoading) return;
         
         _loadingBar.value = Mathf.Lerp(_loadingBar.value, _targetProgress, Time.deltaTime * _fillSpeed);
     }
-
+    
     public async Task LoadSceneAsync(int index)
     {
         _loadingBar.value = 0f;
@@ -111,7 +125,7 @@ public class SceneLoader : MonoBehaviour
         
         EnableLoadingCanvas(false);
     }
-
+    
     public async Task LoadSceneAsync(string sceneName)
     {
         int sceneIndex = FindSceneIndexByName(sceneName);
@@ -123,18 +137,18 @@ public class SceneLoader : MonoBehaviour
         
         await LoadSceneAsync(sceneIndex);
     }
-
+    
     public async Task ReloadCurrentSceneAsync()
     {
         await LoadSceneAsync(_currentSceneIndex);
     }
-
+    
     private void EnableLoadingCanvas(bool enable = true)
     {
         _isLoading = enable;
         _loadingScreen.SetActive(enable);
     }
-
+    
     private int FindSceneIndexByPath(string path)
     {
         for (var i = 0; i < _scenes.Count; i++)
@@ -144,7 +158,7 @@ public class SceneLoader : MonoBehaviour
 
         return -1;
     }
-
+    
     private int FindSceneIndexByName(string name)
     {
         for (var i = 0; i < _scenes.Count; i++)

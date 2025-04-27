@@ -57,5 +57,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 775c056916c1e6c4faef5545781458b2, type: 2}
   - {fileID: 11400000, guid: af5d8f15c5e5b784f98a81cc9075d350, type: 2}
   - {fileID: 11400000, guid: cc75a2612b597e74cab6bfcbb942fbd2, type: 2}
-  _masterVolume: 1
-  _sfxVolume: 1
+  _sfxVolume: 0.5

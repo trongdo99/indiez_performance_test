@@ -8,7 +8,6 @@ public class SoundEffectManager : MonoBehaviour, ISyncInitializable
     public static SoundEffectManager Instance { get; private set; }
     
     [SerializeField] private List<SoundEffectData> _soundEffects = new List<SoundEffectData>();
-    [SerializeField] private float _masterVolume = 1.0f;
     [SerializeField] private float _sfxVolume = 1.0f;
     
     private readonly Dictionary<string, SoundEffectData> _soundDataById = new Dictionary<string, SoundEffectData>();
@@ -145,7 +144,7 @@ public class SoundEffectManager : MonoBehaviour, ISyncInitializable
         sound.SetOnCompleteCallback(HandleSoundCompletion);
         
         // Apply current volume settings
-        sound.SetVolume(soundData.Volume * _sfxVolume * _masterVolume);
+        sound.SetVolume(soundData.Volume * _sfxVolume);
         
         // Add to active sounds
         _activeSounds.Add(sound);
@@ -242,12 +241,6 @@ public class SoundEffectManager : MonoBehaviour, ISyncInitializable
         }
     }
     
-    public void SetMasterVolume(float volume)
-    {
-        _masterVolume = Mathf.Clamp01(volume);
-        UpdateAllActiveSoundVolumes();
-    }
-    
     public void SetSfxVolume(float volume)
     {
         _sfxVolume = Mathf.Clamp01(volume);
@@ -261,7 +254,7 @@ public class SoundEffectManager : MonoBehaviour, ISyncInitializable
             if (_soundToIdMap.TryGetValue(sound, out string soundId) && 
                 _soundDataById.TryGetValue(soundId, out SoundEffectData data))
             {
-                sound.SetVolume(data.Volume * _sfxVolume * _masterVolume);
+                sound.SetVolume(data.Volume * _sfxVolume);
             }
         }
     }
