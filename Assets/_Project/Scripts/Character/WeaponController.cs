@@ -61,13 +61,6 @@ public class WeaponController : MonoBehaviour
                 break;
             }
         }
-        
-        _characterController.OnDeath += HandlePlayerOnDeath;
-    }
-
-    private void OnDestroy()
-    {
-        _characterController.OnDeath -= HandlePlayerOnDeath;
     }
 
     private void Update()
@@ -86,6 +79,14 @@ public class WeaponController : MonoBehaviour
 
     private void UpdateHandsIK()
     {
+        // Turn off all IK if the player is dead
+        if (!_characterController.IsAlive)
+        {
+            _aimRig.weight = 0;
+            _handsRig.weight = 0;
+            return;
+        }
+        
         if (_characterController.IsThrowing)
         {
             _handsRig.weight = 0f;
@@ -194,12 +195,5 @@ public class WeaponController : MonoBehaviour
 
         _weaponLeftHandAttachTransform = _currentWeapon.LeftHandAttachTransform;
         _weaponLeftHandHintTransform = _currentWeapon.LeftHandHinTransform;
-    }
-
-    private void HandlePlayerOnDeath()
-    {
-        _aimRig.weight = 0f;
-        _handsRig.weight = 0f;
-        _isAiming = false;
     }
 }
