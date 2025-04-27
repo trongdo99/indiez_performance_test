@@ -14,6 +14,8 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private Slider _healthSlider;
     [SerializeField] private GameObject _countDownPanel;
     [SerializeField] private TMP_Text _countdownText;
+    [SerializeField] private TMP_Text _waveText;
+    [SerializeField] private TMP_Text _killsCounter;
     
     public void Initialize(IProgress<float> progress = null)
     {
@@ -27,6 +29,8 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Subscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
         EventBus.Instance.Subscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
         EventBus.Instance.Subscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
+        EventBus.Instance.Subscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
+        EventBus.Instance.Subscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
     }
 
     private void OnDisable()
@@ -36,6 +40,8 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Unsubscribe<GameEvents.GameStartingCountDownCompleted>(HandleOnCountDownCompleted);
         EventBus.Instance.Unsubscribe<GameEvents.PlayerDeathAnimationCompleted>(HandlePlayerDeathAnimationCompleted);
         EventBus.Instance.Unsubscribe<GameEvents.PlayerHealthChanged, EventData.PlayerHealthChangedData>(HandlePlayerHealthChanged);
+        EventBus.Instance.Unsubscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
+        EventBus.Instance.Unsubscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
     }
 
     private void HandleGameStateChanged(EventData.GameStateChangedData data)
@@ -115,6 +121,23 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     private void HandlePlayerHealthChanged(EventData.PlayerHealthChangedData data)
     {
         _healthSlider.value = Mathf.Clamp01(data.PlayerController.CurrentHealth / data.PlayerController.MaxHealth);
+    }
+
+    private void HandleWaveCompleted(EventData.WaveCompletedData data)
+    {
+        if (data.IsFinalWave)
+        {
+            _waveText.text = "FINAL WAVE";
+        }
+        else
+        {
+            _waveText.text = $"WAVE {data.WaveNumber + 1}";
+        }
+    }
+
+    private void HandleTotalZombiesKilled(EventData.TotalZombiesKilledData data)
+    {
+        _killsCounter.text = $"{data.TotalZombiesKilled} KILLS";
     }
 
     public async void UI_RestartButtonClicked()

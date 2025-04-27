@@ -147,7 +147,8 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
         EventBus.Instance.Publish<GameEvents.WaveCompleted, EventData.WaveCompletedData>(new EventData.WaveCompletedData
         {
-            WaveNumber = _currentWaveIndex + 1
+            WaveNumber = _currentWaveIndex + 1,
+            IsFinalWave = _currentWaveIndex == _waves.Count - 1,
         });
 
         // Check if this is the final wave
@@ -189,6 +190,11 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     {
         wave.ZombiesKilled++;
         _totalZombiesKilled++;
+        
+        EventBus.Instance.Publish<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(new EventData.TotalZombiesKilledData
+        {
+            TotalZombiesKilled = _totalZombiesKilled
+        });
 
         _activeWaveZombies.Remove(zombie);
     }

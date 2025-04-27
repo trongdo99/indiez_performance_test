@@ -8,6 +8,9 @@ public static class GameEvents
     public struct AllWavesCompleted { }
     public struct WaveCompleted { }
     
+    // Zombie events
+    public struct TotalZombiesKilled { }
+    
     // Game state events
     public struct GameStateChanged { }
     
@@ -21,6 +24,7 @@ public static class EventData
     public class WaveCompletedData
     {
         public int WaveNumber { get; set; }
+        public bool IsFinalWave { get; set; }
     }
     
     public class GameStateChangedData
@@ -39,5 +43,10 @@ public static class EventData
         public PlayerCharacterController  PlayerController { get; set; }
         public float NewHealth { get; set; }
         public float PreviousHealth { get; set; }
+    }
+
+    public class TotalZombiesKilledData
+    {
+        public int TotalZombiesKilled { get; set; }
     }
 }
