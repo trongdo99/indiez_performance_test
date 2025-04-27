@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public abstract class WeaponBase : MonoBehaviour
 {
@@ -38,7 +40,7 @@ public abstract class WeaponBase : MonoBehaviour
     public Transform LeftHandAttachTransform => _leftHandAttachTransform;
     public Transform LeftHandHinTransform => _leftHandHintTransform;
 
-    public abstract void TryToShoot();
+    public abstract bool TryToShoot();
 
     public void Equip()
     {

@@ -7,6 +7,7 @@ public class AnimatorParameters
     public static readonly int AimHorizontal = Animator.StringToHash("AimHorizontal");
     public static readonly int AimVertical = Animator.StringToHash("AimVertical");
     public static readonly int Throw = Animator.StringToHash("Throw");
+    public static readonly int Shoot = Animator.StringToHash("Shoot");
     public static readonly int Die = Animator.StringToHash("Die");
     
     public static readonly int ZombieVelocity = Animator.StringToHash("Velocity");

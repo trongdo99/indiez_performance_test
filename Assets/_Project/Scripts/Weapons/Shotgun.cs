@@ -8,9 +8,9 @@ public class Shotgun : WeaponBase
     [SerializeField] private bool _useRandomizedSpread = true;
     [SerializeField] private float _pelletSpreadAngle = 30f;  // For cone-shaped spread pattern
     
-    public override void TryToShoot()
+    public override bool TryToShoot()
     {
-        if (!(Time.time > _lastShootTime + _shootDelay)) return;
+        if (!(Time.time > _lastShootTime + _shootDelay)) return false;
         
         _lastShootTime = Time.time;
         
@@ -31,6 +31,8 @@ public class Shotgun : WeaponBase
             // Organized cone pattern
             FirePelletPattern();
         }
+
+        return true;
     }
     
     // This method fires a single projectile without playing muzzle effect

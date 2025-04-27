@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class SniperRifle : WeaponBase
 {
-    public override void TryToShoot()
+    public override bool TryToShoot()
     {
-        if (!(Time.time > _lastShootTime + _shootDelay)) return;
+        if (!(Time.time > _lastShootTime + _shootDelay)) return false;
         
         _lastShootTime = Time.time;
         
@@ -13,5 +13,7 @@ public class SniperRifle : WeaponBase
         PlayGunShotSoundEffect();
         
         FireProjectile();
+
+        return true;
     }
 }

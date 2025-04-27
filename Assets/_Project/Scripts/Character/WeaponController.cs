@@ -115,7 +115,11 @@ public class WeaponController : MonoBehaviour
         
         if (angle < _aimAngleThreshold)
         {
-            _currentWeapon.TryToShoot();
+            if (_currentWeapon.TryToShoot())
+            {
+                _characterController.Animator.ResetTrigger(AnimatorParameters.Shoot);
+                _characterController.Animator.SetTrigger(AnimatorParameters.Shoot);
+            }
         }
     }
 
