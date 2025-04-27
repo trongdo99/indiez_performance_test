@@ -28,6 +28,10 @@ public abstract class WeaponBase : MonoBehaviour
     [SerializeField] protected TrailRenderer _bulletTrail;
     [SerializeField] protected Transform _bulletSpawnPosition;
     
+    [Header("Muzzle Flash Lightning")]
+    [SerializeField] protected bool _useMuzzleFlashLightning = true;
+    [SerializeField] protected MuzzleFlashLightSettings _muzzleFlashLightSettings;
+    
     [Header("Visual Effects")]
     [SerializeField] protected VisualEffectData _muzzleFlashEffect;
     [SerializeField] protected Transform _muzzleFlashPosition;
@@ -43,6 +47,7 @@ public abstract class WeaponBase : MonoBehaviour
     [SerializeField] protected Transform _leftHandAttachTransform;
     [SerializeField] protected Transform _leftHandHintTransform;
 
+    protected GunLightController _gunLightController;
     protected float _lastShootTime;
 
     public WeaponType WeaponType => _weaponType;
@@ -52,6 +57,7 @@ public abstract class WeaponBase : MonoBehaviour
     protected virtual void Awake()
     {
         SetupCameraShake();
+        SetupMuzzleLight();
     }
 
     public abstract bool TryToShoot();
@@ -82,6 +88,12 @@ public abstract class WeaponBase : MonoBehaviour
         _impulseSource.ImpulseDefinition.FrequencyGain = _impulseFrequency;
         _impulseSource.ImpulseDefinition.ImpulseDuration = _impulseDuration;
         _impulseSource.DefaultVelocity = _impulseDirection.normalized;
+    }
+
+    protected void SetupMuzzleLight()
+    {
+        if (!_useMuzzleFlashLightning) return;
+        _gunLightController = GetComponent<GunLightController>();
     }
 
     // This method fires a single projectile without playing muzzle effect
@@ -126,6 +138,11 @@ public abstract class WeaponBase : MonoBehaviour
             _muzzleFlashPosition.rotation,
             transform
         );
+
+        if (_useMuzzleFlashLightning && _gunLightController != null)
+        {
+            _gunLightController.TriggerMuzzleFlash();
+        }
     }
 
     protected void PlayImpulseEffect()

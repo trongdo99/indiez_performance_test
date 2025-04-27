@@ -443,6 +443,7 @@ GameObject:
   - component: {fileID: 23875157421364124}
   - component: {fileID: 1928831924205445868}
   - component: {fileID: 5570948327724095747}
+  - component: {fileID: 7150888076564951005}
   m_Layer: 0
   m_Name: SM_Wep_SniperRifle_01
   m_TagString: Untagged
@@ -549,12 +550,47 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _impulseSource: {fileID: 5570948327724095747}
+  _impulseShape: 1
   _impulseAmplitude: 1.5
   _impulseFrequency: 0.8
   _impulseDuration: 0.2
   _impulseDirection: {x: 0, y: -0.7, z: 0.2}
   _bulletTrail: {fileID: 328621789431213768, guid: e763b2f90a9c0054a91f07922c0982a8, type: 3}
   _bulletSpawnPosition: {fileID: 5910687763142826622}
+  _useMuzzleFlashLightning: 1
+  _muzzleFlashLightSettings:
+    LightColor: {r: 1, g: 0.7, b: 0.3, a: 1}
+    Intensity: 3
+    Range: 5
+    Duration: 0.07
+    FadeCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    IntensityVariation: 0.2
+    CastShadows: 0
+    ShadowType: 1
+    ShadowStrength: 0.8
   _muzzleFlashEffect: {fileID: 11400000, guid: 2c5de05829b764d4f9c167f2da25ecf4, type: 2}
   _muzzleFlashPosition: {fileID: 1089200032854467734}
   _impactEffect: {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}
@@ -620,6 +656,52 @@ MonoBehaviour:
     DissipationDistance: 100
     PropagationSpeed: 343
   DefaultVelocity: {x: 0, y: -1, z: 0}
+--- !u!114 &7150888076564951005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1658074229854742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e03ba5c95dad0a44a82d469647d5bc9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lightSettings:
+    LightColor: {r: 1, g: 0.7, b: 0.3, a: 1}
+    Intensity: 3
+    Range: 5
+    Duration: 0.07
+    FadeCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    IntensityVariation: 0.2
+    CastShadows: 0
+    ShadowType: 0
+    ShadowStrength: 0.8
+  _lightAttachPoint: {fileID: 5910687763142826622}
 --- !u!1 &567425352526876117
 GameObject:
   m_ObjectHideFlags: 0
