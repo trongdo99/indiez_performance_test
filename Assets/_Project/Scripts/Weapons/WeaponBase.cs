@@ -109,7 +109,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected void PlayGunShotSoundEffect()
     {
-        SoundEffect soundEffect = SoundEffectManager.Instance.PlayRandomSound(_gunShotSoundEffects, _muzzleFlashPosition.position, transform);
+        SoundEffect soundEffect = SoundEffectManager.Instance.PlayRandomSound(_gunShotSoundEffects, _muzzleFlashPosition.position);
         
         if (soundEffect != null && _randomizePitch)
         {
