@@ -8,7 +8,7 @@ public class MainMenuUIManager : MonoBehaviour
         try
         {
             // TODO: Load correct level
-            await SceneLoader.Instance.LoadSceneAsync("GymScene");
+            await SceneLoader.Instance.LoadSceneAsync("Level1");
         }
         catch (Exception e)
         {

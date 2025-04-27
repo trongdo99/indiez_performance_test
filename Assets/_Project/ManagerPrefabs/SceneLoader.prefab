@@ -192,6 +192,9 @@ MonoBehaviour:
       _sceneAsset: {fileID: 102900000, guid: deccd480076a64d4896b2950f53f0a54, type: 3}
       _scenePath: Assets/_Project/Scenes/MainMenu.unity
   - SceneAsset:
+      _sceneAsset: {fileID: 102900000, guid: dbe71732ba3d71a4e8502a76bfbe46e9, type: 3}
+      _scenePath: Assets/_Project/Scenes/Level1.unity
+  - SceneAsset:
       _sceneAsset: {fileID: 102900000, guid: b23e7a5b07be741d0a8d5cf22e589c32, type: 3}
       _scenePath: Assets/_Project/Scenes/GymScene.unity
   _sceneLoadWeight: 0.5

@@ -129,7 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 25284150}
   - component: {fileID: 25284151}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: NavMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -390,7 +390,7 @@ GameObject:
   - component: {fileID: 1759442366}
   - component: {fileID: 1759442365}
   - component: {fileID: 1759442364}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,7 +566,7 @@ MonoBehaviour:
   _gameUIManagerPrefab: {fileID: 8753187293027526401, guid: b6369f32cdd12b64eb5eeba8e31af1d4, type: 3}
   _playerManagerPrefab: {fileID: 4488604419232031563, guid: e552ab0483f27de438f370db37130fd6, type: 3}
   _zombieManagerPrefab: {fileID: 8921467184638710183, guid: 399d266276408de49852b6ce01f54d53, type: 3}
-  _zombieSpawnManagerPrefab: {fileID: 4769462111072567546, guid: 966d38b46b0ae6a439c7dee7c4c77b97, type: 3}
+  _zombieSpawnManagerPrefab: {fileID: 0}
   _objectPoolManagerPrefab: {fileID: 8833658245213513542, guid: debff4c486c7e834cae0c5d38c9dc036, type: 3}
   _visualEffectManagerPrefab: {fileID: 4022705131275212893, guid: 161f596d4b597a0489e6b95aa4b5ceac, type: 3}
   _soundEffectManagerPrefab: {fileID: 2536060622124147255, guid: 84c99787f16b31b4ebb27bd836012042, type: 3}
