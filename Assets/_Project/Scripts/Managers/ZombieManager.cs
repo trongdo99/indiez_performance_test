@@ -70,8 +70,6 @@ public class ZombieManager : MonoBehaviour, ISyncInitializable
         }
     }
 
-    // ReSharper disable Unity.PerformanceAnalysis
-    // ReSharper disable Unity.PerformanceAnalysis
     public ZombieController SpawnZombie(Vector3 position, Quaternion rotation, int typeIndex = 0)
     {
         // Validate typeIndex

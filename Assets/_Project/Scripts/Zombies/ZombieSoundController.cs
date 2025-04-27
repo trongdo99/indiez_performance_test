@@ -165,7 +165,7 @@ public class ZombieSoundController : MonoBehaviour
     
     public void PlayDeathSound()
     {
-        if (!_isDead || _soundSettings.DeathSounds == null || _soundSettings.DeathSounds.Count == 0) return;
+        if (_isDead || _soundSettings.DeathSounds == null || _soundSettings.DeathSounds.Count == 0) return;
         
         _isDead = true;
         

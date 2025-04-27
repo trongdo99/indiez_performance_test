@@ -6,21 +6,10 @@ using Random = UnityEngine.Random;
 
 public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 {
-    [Serializable]
-    public class Wave
-    {
-        public string WaveName = "Wave 1";
-        public int ZombiesToSpawn = 10;
-        public float SpawnRate = 1f;
-        [HideInInspector] public int ZombiesRemaining;
-        [HideInInspector] public int ZombiesKilled;
-    }
-    
+    [SerializeField] private LevelWaves _levelWaves;
     [SerializeField] private List<Transform> _spawnPoints = new List<Transform>();
-    [SerializeField] private List<Wave> _waves = new List<Wave>();
-    [SerializeField] private float _timeBetweenWaves = 5f;
-    [SerializeField] private bool _autoProgressWaves = true;
     
+    private List<Wave> _waves = new List<Wave>();
     private int _currentWaveIndex = -1;
     private float _nextSpawnTime;
     private float _waveEndTime;
@@ -31,6 +20,20 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private float _pauseStartTime;
     private float _totalPausedTime;
     private bool _isPaused;
+
+    private class Wave
+    {
+        public WaveData Data;
+        public int ZombiesRemaining;
+        public int ZombiesKilled;
+        
+        public Wave(WaveData data)
+        {
+            Data = data;
+            ZombiesRemaining = data.ZombiesToSpawn;
+            ZombiesKilled = 0;
+        }
+    }
 
     public void Initialize(IProgress<float> progress = null)
     {
@@ -50,11 +53,20 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
 
     private void InitializeWaves()
     {
-        foreach (Wave wave in _waves)
+        _waves.Clear();
+        
+        if (_levelWaves == null)
         {
-            wave.ZombiesRemaining = wave.ZombiesToSpawn;
-            wave.ZombiesKilled = 0;
+            Debug.LogError("No LevelWaves assigned to ZombieSpawnManager!");
+            return;
         }
+        
+        foreach (WaveData waveData in _levelWaves.Waves)
+        {
+            _waves.Add(new Wave(waveData));
+        }
+        
+        Debug.Log($"Initialized {_waves.Count} waves from level data");
     }
 
     private void InitializeZombieSpawnPoints()
@@ -83,10 +95,10 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         {
             HandleWaveProgress();
         }
-        else if (_autoProgressWaves && _currentWaveIndex >= 0 && _currentWaveIndex < _waves.Count)
+        else if (_levelWaves.AutoProgressWaves && _currentWaveIndex >= 0 && _currentWaveIndex < _waves.Count)
         {
             float timeSinceWaveEnd = GameplayManager.Instance.GetGameTime() - _waveEndTime;
-            if (timeSinceWaveEnd >= _timeBetweenWaves)
+            if (timeSinceWaveEnd >= _levelWaves.TimeBetweenWaves)
             {
                 StartNextWave();
             }
@@ -101,16 +113,16 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         
         float gameTime = GameplayManager.Instance.GetGameTime();
 
-        if (gameTime >= _nextSpawnTime && _totalZombiesSpawned < currentWave.ZombiesToSpawn)
+        if (gameTime >= _nextSpawnTime && _totalZombiesSpawned < currentWave.Data.ZombiesToSpawn)
         {
             SpawnZombie(currentWave);
             _totalZombiesSpawned++;
-            _nextSpawnTime = gameTime + (1f / currentWave.SpawnRate);
+            _nextSpawnTime = gameTime + (1f / currentWave.Data.SpawnRate);
         }
 
         _activeWaveZombies.RemoveAll(zombie => zombie == null);
 
-        if (_totalZombiesSpawned >= currentWave.ZombiesToSpawn && _activeWaveZombies.Count == 0)
+        if (_totalZombiesSpawned >= currentWave.Data.ZombiesToSpawn && _activeWaveZombies.Count == 0)
         {
             CompleteCurrentWave();
         }
@@ -133,7 +145,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         _totalZombiesSpawned = 0;
         _activeWaveZombies.Clear();
         
-        Debug.Log($"Starting {wave.WaveName} - Spawning {wave.ZombiesToSpawn} zombies");
+        Debug.Log($"Starting {wave.Data.WaveName} - Spawning {wave.Data.ZombiesToSpawn} zombies");
     }
 
     private void CompleteCurrentWave()
@@ -143,7 +155,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         _waveInProgress = false;
         _waveEndTime = GameplayManager.Instance.GetGameTime();
 
-        Debug.Log($"Wave {_waves[_currentWaveIndex].WaveName} completed");
+        Debug.Log($"Wave {_waves[_currentWaveIndex].Data.WaveName} completed");
 
         EventBus.Instance.Publish<GameEvents.WaveCompleted, EventData.WaveCompletedData>(new EventData.WaveCompletedData
         {
@@ -174,7 +186,8 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         Vector3 spawnPosition = selectedSpawnPoint.transform.position;
         Quaternion spawnRotation = selectedSpawnPoint.transform.rotation;
 
-        ZombieController zombie = ZombieManager.Instance.SpawnZombie(spawnPosition, spawnRotation);
+        int zombieTypeIndex = SelectZombieType(currentWave.Data);
+        ZombieController zombie = ZombieManager.Instance.SpawnZombie(spawnPosition, spawnRotation, zombieTypeIndex);
         
         _activeWaveZombies.Add(zombie);
         if (zombie.TryGetComponent(out Health health))
@@ -184,6 +197,32 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
                 HandleZombieDeath(zombie, currentWave);
             };
         }
+    }
+
+    private int SelectZombieType(WaveData waveData)
+    {
+        if (waveData.ZombieTypes == null || waveData.ZombieTypes.Count == 0) return 0;
+        
+        if (waveData.ZombieTypes.Count == 1) return waveData.ZombieTypes[0].ZombieTypeIndex;
+        
+        var totalWeight = 0f;
+        foreach (var zombieType in waveData.ZombieTypes)
+        {
+            totalWeight += zombieType.Weight;
+        }
+        
+        float randomValue = Random.Range(0f, totalWeight);
+        var currentWeight = 0f;
+        foreach (WaveData.ZombieTypeWeight zombieType in waveData.ZombieTypes)
+        {
+            currentWeight += zombieType.Weight;
+            if (randomValue <= currentWeight)
+            {
+                return zombieType.ZombieTypeIndex;
+            }
+        }
+        
+        return waveData.ZombieTypes[0].ZombieTypeIndex;
     }
 
     private void HandleZombieDeath(ZombieController zombie, Wave wave)

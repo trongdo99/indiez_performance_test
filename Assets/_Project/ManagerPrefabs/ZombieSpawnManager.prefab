@@ -44,12 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3d4bb5f887dd349945cf1a3dd9b842, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _levelWaves: {fileID: 11400000, guid: 1f810dcf42d314d41bf5b35a89e100b9, type: 2}
   _spawnPoints: []
-  _waves:
-  - WaveName: 1
-    ZombiesToSpawn: 1
-    SpawnRate: 1
-    ZombiesRemaining: 0
-    ZombiesKilled: 0
-  _timeBetweenWaves: 5
-  _autoProgressWaves: 1
