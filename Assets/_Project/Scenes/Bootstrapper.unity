@@ -175,6 +175,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneLoader
       objectReference: {fileID: 0}
+    - target: {fileID: 6183893145563220117, guid: 2eba2e36200ce5f438f9bf423c035205, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6183893145563220117, guid: 2eba2e36200ce5f438f9bf423c035205, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8162381150287492490, guid: 2eba2e36200ce5f438f9bf423c035205, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
