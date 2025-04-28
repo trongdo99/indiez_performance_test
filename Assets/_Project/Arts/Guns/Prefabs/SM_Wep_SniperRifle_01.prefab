@@ -542,7 +542,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _weaponType: 1
   _damageToHealth: -100
-  _shootDelay: 1
+  _shootDelay: 2
   _speed: 100
   _missDistance: 100
   _spread: {x: 0.05, y: 0.1}

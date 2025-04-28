@@ -18,5 +18,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 099eeb0511d711943b17f348bb601816, type: 2}
   - {fileID: 11400000, guid: b20a2e3d92bfba342a79b5d2e51a8053, type: 2}
   - {fileID: 11400000, guid: bf597a66420037342a41ce4838909c24, type: 2}
+  - {fileID: 11400000, guid: 8698c892472279045837c6b3b9f6c92b, type: 2}
   TimeBetweenWaves: 5
   AutoProgressWaves: 1

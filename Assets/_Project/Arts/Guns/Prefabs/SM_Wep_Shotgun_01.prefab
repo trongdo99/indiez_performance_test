@@ -108,8 +108,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _weaponType: 0
-  _damageToHealth: -10
-  _shootDelay: 1
+  _damageToHealth: -15
+  _shootDelay: 1.5
   _speed: 100
   _missDistance: 100
   _spread: {x: 0.3, y: 0.15}
@@ -158,7 +158,6 @@ MonoBehaviour:
     CastShadows: 0
     ShadowType: 1
     ShadowStrength: 0.8
-    RenderMode: 0
   _muzzleFlashEffect: {fileID: 11400000, guid: d138fd0910436614b92ffb3f4712f24b, type: 2}
   _muzzleFlashPosition: {fileID: 3311840160190003668}
   _impactEffect: {fileID: 11400000, guid: 97db0eaef836809468a0475313d9bdf6, type: 2}
@@ -171,7 +170,7 @@ MonoBehaviour:
   _pitchRange: {x: 0.9, y: 1.1}
   _leftHandAttachTransform: {fileID: 8600514253895295886}
   _leftHandHintTransform: {fileID: 7613162370436562175}
-  _pelletsPerShot: 5
+  _pelletsPerShot: 10
   _pelletSpread: {x: 0.1, y: 0.1}
   _useRandomizedSpread: 0
   _pelletSpreadAngle: 30
@@ -273,7 +272,6 @@ MonoBehaviour:
     CastShadows: 0
     ShadowType: 0
     ShadowStrength: 0.8
-    RenderMode: 0
   _lightAttachPoint: {fileID: 1330581099540903662}
 --- !u!1 &1499018300189918
 GameObject:

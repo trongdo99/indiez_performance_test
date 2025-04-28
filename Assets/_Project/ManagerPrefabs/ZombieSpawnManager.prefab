@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3d4bb5f887dd349945cf1a3dd9b842, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelWaves: {fileID: 11400000, guid: 52c2caba5b0b66b4c8238de98f77ad31, type: 2}
+  _levelWaves: {fileID: 11400000, guid: 1f810dcf42d314d41bf5b35a89e100b9, type: 2}
   _spawnPoints: []

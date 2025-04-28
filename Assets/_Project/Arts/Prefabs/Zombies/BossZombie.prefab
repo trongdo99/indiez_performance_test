@@ -265,7 +265,7 @@ MonoBehaviour:
   _attackCoolDown: 2
   _damageToHealth: -50
   _ragdollRecoveryTime: 3
-  _speedMultiplier: 1.5
+  _speedMultiplier: 2
   _baseMovementSpeed: 1.5
   _minSpeedVariation: 0.8
   _maxSpeedVariation: 1.2
@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e99b428067c4cfe47ab0ddc74969d315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 300
+  _maxHealth: 1000
 --- !u!114 &3977600846037385395
 MonoBehaviour:
   m_ObjectHideFlags: 0

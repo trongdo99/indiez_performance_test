@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 665a3b0e86da245b48f81346c74b8ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxMoveSpeed: 3
+  _maxMoveSpeed: 2.2
   _movementSharpness: 15
   _rotationSharpness: 15
   _gravity: 9
@@ -156,6 +156,7 @@ MonoBehaviour:
   _throwCoolDown: 10
   _arcHeight: 3
   _minimumArcHeight: 1.5
+  _maxGrenades: 3
 --- !u!114 &8089014164323046394
 MonoBehaviour:
   m_ObjectHideFlags: 0
