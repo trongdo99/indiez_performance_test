@@ -17,10 +17,16 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     [SerializeField] private TMP_Text _waveText;
     [SerializeField] private TMP_Text _killsCounter;
     [SerializeField] private GameObject _victoryPanel;
+    [SerializeField] private Slider _throwWeaponCooldownSlider;
+    [SerializeField] private TMP_Text _throwWeaponCounter;
+    
+    private Coroutine _cooldownAnimationCoroutine;
     
     public void Initialize(IProgress<float> progress = null)
     {
         HideAllUI();
+        
+        _throwWeaponCooldownSlider.value = 0f;
     }
 
     private void OnEnable()
@@ -33,6 +39,8 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Subscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
         EventBus.Instance.Subscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
         EventBus.Instance.Subscribe<GameEvents.ShowVictoryPanel>(HandleShowVictoryPanel);
+        EventBus.Instance.Subscribe<GameEvents.ThrowWeaponCooldown, EventData.ThrowWeaponCooldownData>(HandleThrowWeaponCooldown);
+        EventBus.Instance.Subscribe<GameEvents.GrenadeCountChanged, EventData.GrenadeCountChangedData>(HandleGrenadeCountChanged);
     }
 
     private void OnDisable()
@@ -45,6 +53,14 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Unsubscribe<GameEvents.WaveCompleted, EventData.WaveCompletedData>(HandleWaveCompleted);
         EventBus.Instance.Unsubscribe<GameEvents.TotalZombiesKilled, EventData.TotalZombiesKilledData>(HandleTotalZombiesKilled);
         EventBus.Instance.Unsubscribe<GameEvents.ShowVictoryPanel>(HandleShowVictoryPanel);
+        EventBus.Instance.Unsubscribe<GameEvents.ThrowWeaponCooldown, EventData.ThrowWeaponCooldownData>(HandleThrowWeaponCooldown);
+        EventBus.Instance.Unsubscribe<GameEvents.GrenadeCountChanged, EventData.GrenadeCountChangedData>(HandleGrenadeCountChanged);
+        
+        if (_cooldownAnimationCoroutine != null)
+        {
+            StopCoroutine(_cooldownAnimationCoroutine);
+            _cooldownAnimationCoroutine = null;
+        }
     }
 
     private void HandleGameStateChanged(EventData.GameStateChangedData data)
@@ -143,6 +159,44 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
     {
         _killsCounter.text = $"{data.TotalZombiesKilled} KILLS";
     }
+    
+    private void HandleThrowWeaponCooldown(EventData.ThrowWeaponCooldownData data)
+    {
+        if (_throwWeaponCooldownSlider == null) return;
+        
+        if (_cooldownAnimationCoroutine != null)
+        {
+            StopCoroutine(_cooldownAnimationCoroutine);
+        }
+        
+        _cooldownAnimationCoroutine = StartCoroutine(AnimateThrowWeaponCooldown(data.CooldownDuration));
+    }
+    
+    private IEnumerator AnimateThrowWeaponCooldown(float cooldownDuration)
+    {
+        if (_throwWeaponCooldownSlider == null) yield break;
+        
+        _throwWeaponCooldownSlider.value = 1f;
+        
+        var timeElapsed = 0f;
+        while (timeElapsed < cooldownDuration)
+        {
+            float normalizedValue = Mathf.Lerp(1f, 0f, timeElapsed / cooldownDuration);
+            _throwWeaponCooldownSlider.value = normalizedValue;
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        _throwWeaponCooldownSlider.value = 0f;
+        _cooldownAnimationCoroutine = null;
+    }
+
+    private void HandleGrenadeCountChanged(EventData.GrenadeCountChangedData data)
+    {
+        if (_throwWeaponCounter == null) return;
+        
+        _throwWeaponCounter.text = data.NewGrenadeCount.ToString();
+    }
 
     private void HandleShowVictoryPanel()
     {
@@ -160,7 +214,7 @@ public class GameUIManager : MonoBehaviour, ISyncInitializable
         var canvasGroup = _victoryPanel.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
-            _victoryPanel.AddComponent<CanvasGroup>();
+            canvasGroup = _victoryPanel.AddComponent<CanvasGroup>();
         }
         
         canvasGroup.alpha = 0f;

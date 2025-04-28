@@ -9,20 +9,26 @@ public class ThrowWeaponController : MonoBehaviour
     [SerializeField] private float _throwCoolDown = 1f;
     [SerializeField] private float _arcHeight = 3f;
     [SerializeField] private float _minimumArcHeight = 1.5f;
+    [SerializeField] private int _maxGrenades = 3;
     
     private float _lastThrowTime;
     private TargetFinder _targetFinder;
     private PlayerAnimationEventProxy _playerAnimationEventProxy;
     private WeaponController _weaponController;
     private bool _isThrowingAnimation;
+    private int _currentGrenades;
     
     public bool IsThrowingAnimation => _isThrowingAnimation;
+    public int MaxGrenades => _maxGrenades;
+    public int CurrentGrenades => _currentGrenades;
 
     private void Awake()
     {
         _targetFinder = GetComponent<TargetFinder>();
         _playerAnimationEventProxy = GetComponentInChildren<PlayerAnimationEventProxy>();
         _weaponController = GetComponent<WeaponController>();
+        _lastThrowTime = -_throwCoolDown;
+        UpdateGrenadeCount(_maxGrenades);
     }
 
     private void Start()
@@ -57,6 +63,18 @@ public class ThrowWeaponController : MonoBehaviour
         {
             grenade.Initialize(initialVelocity);
             _lastThrowTime = Time.time;
+
+            UpdateGrenadeCount(_currentGrenades - 1);
+
+            if (_currentGrenades > 0)
+            {
+                EventBus.Instance.Publish<GameEvents.ThrowWeaponCooldown, EventData.ThrowWeaponCooldownData>(
+                    new EventData.ThrowWeaponCooldownData
+                    {
+                        CooldownDuration = _throwCoolDown
+                    }
+                );
+            }
         }
         else
         {
@@ -65,21 +83,31 @@ public class ThrowWeaponController : MonoBehaviour
         }
     }
 
-    private bool CanThrow()
+    public bool CanThrow()
     {
         // Check cooldown
-        if (Time.time < _lastThrowTime + _throwCoolDown)
-        {
-            return false;
-        }
+        if (Time.time < _lastThrowTime + _throwCoolDown) return false;
+        
+        // Check grenade count
+        if (_currentGrenades <= 0) return false;
 
         // Check game state
-        if (GameplayManager.Instance.IsGamePaused)
-        {
-            return false;
-        }
+        if (GameplayManager.Instance.IsGamePaused) return false;
 
         return true;
+    }
+
+    private void UpdateGrenadeCount(int newGrenades)
+    {
+        _currentGrenades = newGrenades;
+        if (_currentGrenades < 0) _currentGrenades = 0;
+
+        Debug.Log($"Update grenade count {_currentGrenades}");
+        
+        EventBus.Instance.Publish<GameEvents.GrenadeCountChanged, EventData.GrenadeCountChangedData>(new EventData.GrenadeCountChangedData
+        {
+            NewGrenadeCount = _currentGrenades
+        });
     }
 
     private Vector3 DetermineThrowTargetPosition()

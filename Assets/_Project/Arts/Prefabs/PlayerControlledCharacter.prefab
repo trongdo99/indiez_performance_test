@@ -153,7 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _grenade: {fileID: 1067534318223756700, guid: 83bb90addc1fcfa4395208198a28f66c, type: 3}
   _throwPoint: {fileID: 101169546769876880}
-  _throwCoolDown: 1
+  _throwCoolDown: 10
   _arcHeight: 3
   _minimumArcHeight: 1.5
 --- !u!114 &8089014164323046394

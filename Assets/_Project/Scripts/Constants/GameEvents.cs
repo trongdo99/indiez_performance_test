@@ -3,6 +3,8 @@ public static class GameEvents
     // Player events
     public struct PlayerDeathAnimationCompleted { }
     public struct PlayerHealthChanged { }
+    public struct ThrowWeaponCooldown { }
+    public struct GrenadeCountChanged { }
     
     // Waves events
     public struct AllWavesCompleted { }
@@ -54,5 +56,15 @@ public static class EventData
     public class TotalZombiesKilledData
     {
         public int TotalZombiesKilled { get; set; }
+    }
+
+    public class ThrowWeaponCooldownData
+    {
+        public float CooldownDuration { get; set; }
+    }
+    
+    public class GrenadeCountChangedData
+    {
+        public int NewGrenadeCount { get; set; }
     }
 }

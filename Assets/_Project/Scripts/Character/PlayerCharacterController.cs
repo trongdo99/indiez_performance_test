@@ -166,7 +166,7 @@ public class PlayerCharacterController : StateMachine<PlayerStateType>
 
     public void Throw()
     {
-        if (!CanAim) return;
+        if (!CanAim || !_throwWeaponController.CanThrow()) return;
         _animator.SetTrigger(AnimatorParameters.Throw);
         _throwWeaponController.StartThrowSequence();
     }
