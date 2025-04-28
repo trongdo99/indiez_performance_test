@@ -63,7 +63,7 @@ public class ObjectPool<T> where T : Component, IPoolable
         }
 
         T newObject = Object.Instantiate(_prefab, _poolParent);
-        newObject.gameObject.SetActive(setActive);
+        newObject.gameObject.SetActive(false);
         
         if (!setActive)
         {
@@ -83,7 +83,7 @@ public class ObjectPool<T> where T : Component, IPoolable
         }
         else if (_shouldExpand)
         {
-            obj = CreateNewInstance();
+            obj = CreateNewInstance(true);
             if (obj == null)
             {
                 // Return the oldest active object if we can't create more
