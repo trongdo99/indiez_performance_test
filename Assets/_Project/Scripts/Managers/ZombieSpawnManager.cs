@@ -21,7 +21,8 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private float _totalPausedTime;
     private bool _isPaused;
     private bool _bossSpawned;
-
+    private Dictionary<int, Action> _zombieHealthSubscriptions = new Dictionary<int, Action>();
+    
     private class Wave
     {
         public WaveData Data;
@@ -207,10 +208,18 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         _activeWaveZombies.Add(zombie);
         if (zombie.TryGetComponent(out Health health))
         {
-            health.OnHealthReachedZero += () =>
+            int healthId = health.GetInstanceID();
+            if (_zombieHealthSubscriptions.ContainsKey(healthId))
             {
-                HandleZombieDeath(zombie, currentWave);
+                health.OnHealthReachedZero -= _zombieHealthSubscriptions[healthId];
+            }
+
+            Action healthCallback = () =>
+            {
+                HandleZombieDeath(zombie, currentWave, health);
             };
+            health.OnHealthReachedZero += healthCallback;
+            _zombieHealthSubscriptions[healthId] = healthCallback;
         }
     }
 
@@ -235,7 +244,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         {
             health.OnHealthReachedZero += () =>
             {
-                HandleZombieDeath(boss, currentWave);
+                HandleZombieDeath(boss, currentWave, health);
                 EventBus.Instance.Publish<GameEvents.BossDefeated>();
             };
         }
@@ -271,8 +280,15 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         return waveData.ZombieTypes[0].ZombieTypeIndex;
     }
 
-    private void HandleZombieDeath(ZombieController zombie, Wave wave)
+    private void HandleZombieDeath(ZombieController zombie, Wave wave, Health health)
     {
+        int healthId = health.GetInstanceID();
+        if (_zombieHealthSubscriptions.ContainsKey(healthId))
+        {
+            health.OnHealthReachedZero -= _zombieHealthSubscriptions[healthId];
+            _zombieHealthSubscriptions.Remove(healthId);
+        }
+        
         wave.ZombiesKilled++;
         _totalZombiesKilled++;
         
