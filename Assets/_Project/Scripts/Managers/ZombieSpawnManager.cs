@@ -175,7 +175,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         EventBus.Instance.Publish<GameEvents.WaveCompleted, EventData.WaveCompletedData>(new EventData.WaveCompletedData
         {
             WaveNumber = _currentWaveIndex + 1,
-            IsFinalWave = _currentWaveIndex == _waves.Count - 1,
+            IsFinalWave = _currentWaveIndex + 1 == _waves.Count - 1,
         });
 
         // Check if this is the final wave
