@@ -53,3 +53,7 @@ MonoBehaviour:
     ZombiePrefab: {fileID: 4790168810827744405, guid: e0a7ff39db16be740bd51514f0a697dd, type: 3}
     InitialPoolSize: 10
     Controller: {fileID: 0}
+  - TypeName: Boss
+    ZombiePrefab: {fileID: 4790168810827744405, guid: bea0cc1dfccf14d4eafdb34d7b18fbaf, type: 3}
+    InitialPoolSize: 1
+    Controller: {fileID: 0}

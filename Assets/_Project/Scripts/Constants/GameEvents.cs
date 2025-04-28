@@ -10,7 +10,10 @@ public static class GameEvents
     
     // Zombie events
     public struct TotalZombiesKilled { }
-    
+
+    public struct BossSpawned { }
+    public struct BossDefeated { }
+
     // Game state events
     public struct GameStateChanged { }
     

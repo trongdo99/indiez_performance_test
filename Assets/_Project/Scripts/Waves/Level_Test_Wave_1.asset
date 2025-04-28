@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Level_Test_Wave_1
   m_EditorClassIdentifier: 
   WaveName: Wave 1
-  ZombiesToSpawn: 40
+  ZombiesToSpawn: 2
   SpawnRate: 3
   ZombieTypes:
   - ZombieTypeIndex: 0
     Weight: 0
+  IncludesBoss: 0
+  BossZombieTypeIndex: 0
+  BossSpawnTiming: 0.5

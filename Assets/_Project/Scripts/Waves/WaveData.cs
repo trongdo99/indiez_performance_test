@@ -17,6 +17,16 @@ public class WaveData : ScriptableObject
     [Tooltip("Zombie type indices and their spawn weights")]
     public List<ZombieTypeWeight> ZombieTypes = new List<ZombieTypeWeight>();
     
+    [Tooltip("Whether this wave includes a boss zombie")]
+    public bool IncludesBoss;
+    
+    [Tooltip("Boss zombie type index")]
+    public int BossZombieTypeIndex = 0;
+    
+    [Tooltip("When to spawn the boss (percentage of wave completion, 0-1)")]
+    [Range(0, 1)]
+    public float BossSpawnTiming = 0.5f;
+    
     [Serializable]
     public class ZombieTypeWeight
     {

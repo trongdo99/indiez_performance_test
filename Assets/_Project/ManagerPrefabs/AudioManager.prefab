@@ -50,6 +50,7 @@ MonoBehaviour:
   _musicSourceFadeOut: {fileID: 6161938137802299338}
   _menuMusic: {fileID: 8300000, guid: ce7d1d678b6719d44b80a3ed372ac0aa, type: 3}
   _gameplayMusic: {fileID: 8300000, guid: 2ef3f6447b35e8147a7e0ce004bc9143, type: 3}
+  _bossMusic: {fileID: 8300000, guid: 0395db4c84303b648be42d3087577905, type: 3}
   _fadeInDuration: 1
   _fadeOutDuration: 1
   _musicVolume: 1

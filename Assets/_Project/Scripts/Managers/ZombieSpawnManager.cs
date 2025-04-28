@@ -20,6 +20,7 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
     private float _pauseStartTime;
     private float _totalPausedTime;
     private bool _isPaused;
+    private bool _bossSpawned;
 
     private class Wave
     {
@@ -113,6 +114,13 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         
         float gameTime = GameplayManager.Instance.GetGameTime();
 
+        // Check if it's time to spawn a boss
+        if (currentWave.Data.IncludesBoss && !_bossSpawned && 
+            currentWave.ZombiesKilled >= (currentWave.Data.ZombiesToSpawn * currentWave.Data.BossSpawnTiming))
+        {
+            SpawnBossZombie(currentWave);
+        }
+
         if (gameTime >= _nextSpawnTime && _totalZombiesSpawned < currentWave.Data.ZombiesToSpawn)
         {
             SpawnZombie(currentWave);
@@ -144,8 +152,15 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
         _nextSpawnTime = Time.time; // Start spawning immediately
         _totalZombiesSpawned = 0;
         _activeWaveZombies.Clear();
+        _bossSpawned = false;
+
+        if (wave.Data.IncludesBoss)
+        {
+            AudioManager.Instance.PlayBossMusic();
+        }
         
-        Debug.Log($"Starting {wave.Data.WaveName} - Spawning {wave.Data.ZombiesToSpawn} zombies");
+        Debug.Log($"Starting {wave.Data.WaveName} - Spawning {wave.Data.ZombiesToSpawn} zombies" + 
+                  (wave.Data.IncludesBoss ? " with a boss" : ""));
     }
 
     private void CompleteCurrentWave()
@@ -197,6 +212,37 @@ public class ZombieSpawnManager : MonoBehaviour, ISyncInitializable
                 HandleZombieDeath(zombie, currentWave);
             };
         }
+    }
+
+    private void SpawnBossZombie(Wave currentWave)
+    {
+        Transform selectedSpawnPoint = SelectSpawnPoint();
+        if (selectedSpawnPoint == null)
+        {
+            Debug.LogWarning("No zombie spawn points available, skipping boss spawn. Check the scene for ZombieSpawnPoint tags.");
+            return;
+        }
+        
+        Vector3 spawnPosition = selectedSpawnPoint.transform.position;
+        Quaternion spawnRotation = selectedSpawnPoint.transform.rotation;
+
+        int bossTypeIndex = currentWave.Data.BossZombieTypeIndex;
+        ZombieController boss = ZombieManager.Instance.SpawnZombie(spawnPosition, spawnRotation, bossTypeIndex);
+        
+        _activeWaveZombies.Add(boss);
+        _bossSpawned = true;
+        if (boss.TryGetComponent(out Health health))
+        {
+            health.OnHealthReachedZero += () =>
+            {
+                HandleZombieDeath(boss, currentWave);
+                EventBus.Instance.Publish<GameEvents.BossDefeated>();
+            };
+        }
+        
+        EventBus.Instance.Publish<GameEvents.BossSpawned>();
+        
+        Debug.Log($"Boss zombie spawned in wave {currentWave.Data.WaveName}");
     }
 
     private int SelectZombieType(WaveData waveData)

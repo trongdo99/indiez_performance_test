@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Waves:
   - {fileID: 11400000, guid: 06d87ae1cbf076b4a915f9a736bf2283, type: 2}
+  - {fileID: 11400000, guid: fd429b0a6bcdeb24fb109996eacddd1a, type: 2}
   TimeBetweenWaves: 5
   AutoProgressWaves: 1

@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
     [Header("Music Clips")]
     [SerializeField] private AudioClip _menuMusic;
     [SerializeField] private AudioClip _gameplayMusic;
+    [SerializeField] private AudioClip _bossMusic;
     
     [Header("Settings")]
     [SerializeField] private float _fadeInDuration = 1.0f;
@@ -104,9 +105,18 @@ public class AudioManager : MonoBehaviour
     {
         PlayMusic(_menuMusic);
     }
+    
     public void PlayGameplayMusic()
     {
         PlayMusic(_gameplayMusic);
+    }
+    
+    public void PlayBossMusic()
+    {
+        if (_bossMusic != null)
+        {
+            PlayMusic(_bossMusic);
+        }
     }
     
     public void PlayMusic(AudioClip clip)
@@ -149,6 +159,7 @@ public class AudioManager : MonoBehaviour
         _musicSource.Pause();
         _musicSourceFadeOut.Pause();
     }
+    
     public void ResumeMusic()
     {
         _musicSource.UnPause();
